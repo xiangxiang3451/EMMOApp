@@ -1,0 +1,31 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main  # 当推送到 main 分支时触发
+  pull_request:
+    branches:
+      - main  # 当创建 PR 指向 main 分支时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3  # 检出代码
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2  # 设置 Flutter 环境
+        with:
+          flutter-version: 'stable'  # 可以指定具体 Flutter 版本，或使用 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get  # 安装依赖
+
+      - name: Analyze code
+        run: flutter analyze  # 运行 Flutter 代码分析
+
+      - name: Run tests
+        run: flutter test  # 运行 Flutter 单元测试
