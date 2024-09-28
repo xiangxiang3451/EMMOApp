@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'package:emotion_recognition/models/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:emotion_recognition/public_widgets/auth_widgets.dart'; 
-import 'register_screen.dart'; // 导入注册页面
+import 'package:http/http.dart' as http;
+import 'package:emotion_recognition/public_widgets/auth_widgets.dart';
+import 'register_screen.dart'; 
+import 'home_screen.dart'; // 确保导入主界面的类
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,14 +15,45 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login() {
-    // 实现登录逻辑
+  Future<void> _login() async {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    // 调用登录服务 (可以与Firebase结合)
-    print('Logging in with email: $email and password: $password');
-    // TODO: Call your authentication service here
+    // 发送登录请求到 Flask 后端
+    final response = await http.post(
+      Uri.parse('$BackEndUrl/login'), // 本地 Flask 后端 URL
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // 登录成功
+      print('登录成功');
+
+      // 显示成功提示
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('登录成功')),
+      );
+
+      // 跳转到主界面
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()), // 确保 MainScreen 是你的主界面
+        );
+      });
+    } else {
+      // 登录失败
+      print('登录失败: ${response.body}');
+
+      // 显示失败提示
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('登录失败: ${response.body}')),
+      );
+    }
   }
 
   @override
