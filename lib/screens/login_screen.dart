@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'package:emotion_recognition/models/constants.dart';
+import 'package:emotion_recognition/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:emotion_recognition/public_widgets/auth_widgets.dart';
-import 'register_screen.dart'; 
-import 'home_screen.dart'; // 确保导入主界面的类
+import 'home_screen.dart'; // 确保导入主界面
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -40,9 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // 跳转到主界面
       Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pushReplacement(
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => HomeScreen()), // 跳转到主界面
+        // );
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()), // 确保 MainScreen 是你的主界面
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+          (route) => false, // 这将移除所有的页面
         );
       });
     } else {
@@ -67,28 +71,27 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AuthInputField(
-              labelText: '邮箱',
+            TextField(
+              decoration: const InputDecoration(labelText: '邮箱'),
               controller: _emailController,
             ),
             const SizedBox(height: 16.0),
-            AuthInputField(
-              labelText: '密码',
+            TextField(
+              decoration: const InputDecoration(labelText: '密码'),
               controller: _passwordController,
               obscureText: true,
             ),
             const SizedBox(height: 16.0),
-            AuthButton(
-              text: '登录',
+            ElevatedButton(
               onPressed: _login,
+              child: const Text('登录'),
             ),
             const SizedBox(height: 16.0),
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegisterScreen()),
-                );
+                // 导航到注册界面
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => RegisterScreen()));
               },
               child: const Text('没有账号？注册'),
             ),
