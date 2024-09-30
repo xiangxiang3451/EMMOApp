@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:emotion_recognition/models/constants.dart';
+import 'package:emotion_recognition/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:emotion_recognition/public_widgets/auth_widgets.dart';
@@ -31,6 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // 验证码发送成功
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('验证码已发送，请检查您的邮箱')),
+
       );
       setState(() {
         _isCodeSent = true; // 更新状态
@@ -56,13 +58,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'code': verificationCode,
       }),
     );
-    
 
     if (response.statusCode == 200) {
       // 验证成功
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('验证成功，注册完成！')),
       );
+
+      // 解析响应并保存用户 ID
+      // final responseData = jsonDecode(response.body);
+      // User user = User(); // 获取单例
+      // user.userId = responseData['user_id']; // 假设后端返回的用户 ID 字段为 'user_id'
+      // user.email = email; // 可选：存储邮箱
 
       // 跳转到登录页面
       Future.delayed(const Duration(seconds: 1), () {

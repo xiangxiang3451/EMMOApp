@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:emotion_recognition/models/constants.dart';
 import 'package:emotion_recognition/screens/register_screen.dart';
+import 'package:emotion_recognition/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'home_screen.dart'; // 确保导入主界面
@@ -36,7 +37,10 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('登录成功')),
       );
-
+     // 解析响应并保存用户 ID
+      final responseData = jsonDecode(response.body);
+      User user = User(); // 获取单例
+      user.userId = responseData['user_id']; // 假设后端返回的用户 ID 字段为 'user_id'
       // 跳转到主界面
       Future.delayed(const Duration(seconds: 1), () {
         // Navigator.pushReplacement(

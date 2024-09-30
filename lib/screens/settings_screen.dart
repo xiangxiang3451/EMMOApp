@@ -1,7 +1,11 @@
+import 'package:emotion_recognition/models/constants.dart';
+import 'package:emotion_recognition/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'login_screen.dart'; // 导入登录界面
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -51,6 +55,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() {
         _profileImage = image;
       });
+      // 上传头像
+      await _uploadAvatar(image);
+    }
+  }
+
+  // 上传头像到后端
+  Future<void> _uploadAvatar(XFile image) async {
+    final bytes = await image.readAsBytes();
+    final base64Image = base64Encode(bytes);
+
+    // 获取用户 ID
+    String? userId = User().userId;
+
+    final response = await http.post(
+      Uri.parse('$BackEndUrl/upload_avatar'), // 后端 URL
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'user_id': userId, // 使用单例获取用户 ID
+        'file': base64Image, // 发送图像的 Base64 字符串
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('头像上传成功！')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('头像上传失败: ${response.body}')),
+      );
     }
   }
 
