@@ -1,4 +1,5 @@
 import 'package:emotion_recognition/models/constants.dart';
+import 'package:emotion_recognition/services/theme_notifier.dart';
 import 'package:emotion_recognition/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +7,7 @@ import 'dart:io';
 import 'login_screen.dart'; // 导入登录界面
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:provider/provider.dart'; // 导入 Provider 包
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -18,7 +20,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // 不再需要加载头像，因为我们始终从数据库获取
   }
 
   // 弹出底部菜单，选择拍照或从相册选择
@@ -66,51 +67,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // 上传头像到后端
-  // 上传头像到后端
-Future<void> _uploadAvatar(XFile image) async {
-  final bytes = await image.readAsBytes();
-  final base64Image = base64Encode(bytes);
+  Future<void> _uploadAvatar(XFile image) async {
+    final bytes = await image.readAsBytes();
+    final base64Image = base64Encode(bytes);
 
-  // 获取用户 ID
-  String? userId = User().userId;
+    // 获取用户 ID
+    String? userId = User().userId;
 
-  try {
-    final response = await http.post(
-      Uri.parse('$BackEndUrl/upload_avatar'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        'user_id': userId,
-        'file': base64Image,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      String newAvatarUrl = responseData['avatar_url']; // 获取新头像 URL
-
-      // 更新状态以显示新头像
-      setState(() {
-        _profileImage = null; // 清除本地图像，以确保显示网络图像
-      });
-
-      // 更新用户的头像 URL
-      User().avatarUrl = newAvatarUrl;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('头像上传成功！')),
+    try {
+      final response = await http.post(
+        Uri.parse('$BackEndUrl/upload_avatar'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'user_id': userId,
+          'file': base64Image,
+        }),
       );
-    } else {
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        String newAvatarUrl = responseData['avatar_url']; // 获取新头像 URL
+
+        // 更新状态以显示新头像
+        setState(() {
+          _profileImage = null; // 清除本地图像，以确保显示网络图像
+        });
+
+        // 更新用户的头像 URL
+        User().avatarUrl = newAvatarUrl;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('头像上传成功！')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('头像上传失败: ${response.body}')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('头像上传失败: ${response.body}')),
+        SnackBar(content: Text('上传过程中发生错误: $e')),
       );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('上传过程中发生错误: $e')),
-    );
   }
-}
-
 
   // 退出登录功能
   void _logout() {
@@ -125,13 +124,14 @@ Future<void> _uploadAvatar(XFile image) async {
 
   @override
   Widget build(BuildContext context) {
-   String? avatarUrl = User().avatarUrl; // 获取用户头像 URL
-  String imageUrl = (avatarUrl != null && avatarUrl.isNotEmpty)
-      ? 'https://firebasestorage.googleapis.com/v0/b/emotion-recognition-c7d78.appspot.com/o/${Uri.encodeComponent(avatarUrl.replaceFirst('https://storage.googleapis.com/emotion-recognition-c7d78.appspot.com/', ''))}?alt=media'
-      : ''; // 如果没有头像，则留空
+    String? avatarUrl = User().avatarUrl; // 获取用户头像 URL
+    String imageUrl = (avatarUrl != null && avatarUrl.isNotEmpty)
+        ? 'https://firebasestorage.googleapis.com/v0/b/emotion-recognition-c7d78.appspot.com/o/${Uri.encodeComponent(avatarUrl.replaceFirst('https://storage.googleapis.com/emotion-recognition-c7d78.appspot.com/', ''))}?alt=media'
+        : ''; // 如果没有头像，则留空
 
+    // 获取主题通知器
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
 
-    print(imageUrl);
     return Scaffold(
       appBar: AppBar(
         title: const Text('设置'),
@@ -156,7 +156,6 @@ Future<void> _uploadAvatar(XFile image) async {
                           height: 100,
                           fit: BoxFit.cover,
                           errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                            // 当图像加载失败时显示错误信息
                             return Container(
                               color: Colors.red[200], // 背景颜色
                               child: const Center(
@@ -189,7 +188,7 @@ Future<void> _uploadAvatar(XFile image) async {
           const Divider(height: 40),
           _buildLanguageSection(),
           const Divider(height: 40),
-          _buildExportDataSection(),
+          _buildThemeSection(themeNotifier), // 添加主题切换部分
         ],
       ),
     );
@@ -249,16 +248,16 @@ Future<void> _uploadAvatar(XFile image) async {
     );
   }
 
-  // 数据导出部分
-  Widget _buildExportDataSection() {
+  // 主题设置部分
+  Widget _buildThemeSection(ThemeNotifier themeNotifier) {
     return ListTile(
-      leading: const Icon(Icons.file_download),
-      title: const Text('导出数据'),
-      subtitle: const Text('导出情感分析数据报告'),
-      trailing: IconButton(
-        icon: const Icon(Icons.arrow_forward_ios),
-        onPressed: () {
-          // 跳转到数据导出界面
+      leading: const Icon(Icons.color_lens),
+      title: const Text('主题设置'),
+      subtitle: const Text('切换应用主题'),
+      trailing: Switch(
+        value: themeNotifier.isDarkMode,
+        onChanged: (value) {
+          themeNotifier.toggleTheme(); // 切换主题
         },
       ),
     );
