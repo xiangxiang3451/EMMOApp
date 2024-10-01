@@ -37,16 +37,16 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('登录成功')),
       );
-     // 解析响应并保存用户 ID
+      // 解析响应并保存用户 ID 和头像 URL
       final responseData = jsonDecode(response.body);
       User user = User(); // 获取单例
       user.userId = responseData['user_id']; // 假设后端返回的用户 ID 字段为 'user_id'
+      user.avatarUrl = responseData['avatar_url']; // 保存头像 URL
+      print('Avatar URL: ${User().avatarUrl}');
+
+
       // 跳转到主界面
       Future.delayed(const Duration(seconds: 1), () {
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => HomeScreen()), // 跳转到主界面
-        // );
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),

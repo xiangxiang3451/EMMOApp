@@ -6,11 +6,11 @@ class AuthInputField extends StatelessWidget {
   final bool obscureText;
 
   const AuthInputField({
-    Key? key,
+    super.key,
     required this.labelText,
     required this.controller,
     this.obscureText = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +30,10 @@ class AuthButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const AuthButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

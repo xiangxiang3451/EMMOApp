@@ -13,8 +13,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // 用于管理头像图片
   XFile? _profileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    // 不再需要加载头像，因为我们始终从数据库获取
+  }
 
   // 弹出底部菜单，选择拍照或从相册选择
   Future<void> _showImageSourceActionSheet(BuildContext context) async {
@@ -68,23 +73,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // 获取用户 ID
     String? userId = User().userId;
 
-    final response = await http.post(
-      Uri.parse('$BackEndUrl/upload_avatar'), // 后端 URL
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        'user_id': userId, // 使用单例获取用户 ID
-        'file': base64Image, // 发送图像的 Base64 字符串
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('头像上传成功！')),
+    try {
+      final response = await http.post(
+        Uri.parse('$BackEndUrl/upload_avatar'), // 后端 URL
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'user_id': userId, // 使用单例获取用户 ID
+          'file': base64Image, // 发送图像的 Base64 字符串
+        }),
       );
-    } else {
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('头像上传成功！')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('头像上传失败: ${response.body}')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('头像上传失败: ${response.body}')),
+        SnackBar(content: Text('上传过程中发生错误: $e')),
       );
     }
   }
@@ -102,6 +112,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+   String? avatarUrl = User().avatarUrl; // 获取用户头像 URL
+  String imageUrl = (avatarUrl != null && avatarUrl.isNotEmpty)
+      ? 'https://firebasestorage.googleapis.com/v0/b/emotion-recognition-c7d78.appspot.com/o/${Uri.encodeComponent(avatarUrl.replaceFirst('https://storage.googleapis.com/emotion-recognition-c7d78.appspot.com/', ''))}?alt=media'
+      : ''; // 如果没有头像，则留空
+
+
+    print(imageUrl);
     return Scaffold(
       appBar: AppBar(
         title: const Text('设置'),
@@ -117,17 +134,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: _profileImage != null
-                    ? FileImage(File(_profileImage!.path))
-                    : const AssetImage('assets/default_avatar.png')
-                        as ImageProvider,
-                child: _profileImage == null
-                    ? const Icon(
-                        Icons.camera_alt,
-                        size: 40,
-                        color: Colors.white,
+                backgroundColor: Colors.grey[300],
+                child: imageUrl.isNotEmpty
+                    ? ClipOval(
+                        child: Image.network(
+                          imageUrl,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                            // 当图像加载失败时显示错误信息
+                            return Container(
+                              color: Colors.red[200], // 背景颜色
+                              child: const Center(
+                                child: Text(
+                                  '图像加载失败',
+                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       )
-                    : null,
+                    : const Icon(Icons.person, size: 50), // 如果没有头像，显示默认图标
               ),
             ),
           ),
@@ -184,7 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: const Text('通知设置'),
       subtitle: const Text('启用或禁用通知'),
       trailing: Switch(
-        value: true,
+        value: true, // 这里可以根据用户的设置状态动态改变
         onChanged: (bool value) {
           // 切换通知功能
         },

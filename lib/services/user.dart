@@ -13,5 +13,6 @@ class User {
 
   String? userId; // 用户 ID
   // String? email; // 用户邮箱
+   String? avatarUrl;  // 添加头像URL字段
   
 }

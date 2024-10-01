@@ -1,4 +1,3 @@
-import 'package:emotion_recognition/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart'; // 导入登录页面
 
