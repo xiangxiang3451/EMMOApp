@@ -66,38 +66,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // 上传头像到后端
-  Future<void> _uploadAvatar(XFile image) async {
-    final bytes = await image.readAsBytes();
-    final base64Image = base64Encode(bytes);
+  // 上传头像到后端
+Future<void> _uploadAvatar(XFile image) async {
+  final bytes = await image.readAsBytes();
+  final base64Image = base64Encode(bytes);
 
-    // 获取用户 ID
-    String? userId = User().userId;
+  // 获取用户 ID
+  String? userId = User().userId;
 
-    try {
-      final response = await http.post(
-        Uri.parse('$BackEndUrl/upload_avatar'), // 后端 URL
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          'user_id': userId, // 使用单例获取用户 ID
-          'file': base64Image, // 发送图像的 Base64 字符串
-        }),
-      );
+  try {
+    final response = await http.post(
+      Uri.parse('$BackEndUrl/upload_avatar'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'user_id': userId,
+        'file': base64Image,
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('头像上传成功！')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('头像上传失败: ${response.body}')),
-        );
-      }
-    } catch (e) {
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      String newAvatarUrl = responseData['avatar_url']; // 获取新头像 URL
+
+      // 更新状态以显示新头像
+      setState(() {
+        _profileImage = null; // 清除本地图像，以确保显示网络图像
+      });
+
+      // 更新用户的头像 URL
+      User().avatarUrl = newAvatarUrl;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('上传过程中发生错误: $e')),
+        const SnackBar(content: Text('头像上传成功！')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('头像上传失败: ${response.body}')),
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('上传过程中发生错误: $e')),
+    );
   }
+}
+
 
   // 退出登录功能
   void _logout() {
