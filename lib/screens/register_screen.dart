@@ -7,6 +7,8 @@ import 'package:emotion_recognition/public_widgets/auth_widgets.dart';
 import 'login_screen.dart'; // 导入登录页面的类
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }

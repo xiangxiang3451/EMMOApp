@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'home_screen.dart'; // 确保导入主界面
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }

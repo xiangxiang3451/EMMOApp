@@ -7,6 +7,8 @@ import 'history_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -16,9 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 页面选项列表
   static final List<Widget> _widgetOptions = <Widget>[
-    EmotionAnalysisScreen(), // 实时情感分析页面
-    ReportScreen(), // 报告页面
-    HistoryScreen(), // 历史数据页面
+    const EmotionAnalysisScreen(), // 实时情感分析页面
+    const ReportScreen(), // 报告页面
+    const HistoryScreen(), // 历史数据页面
     SettingsScreen(), // 设置页面
   ];
 
@@ -34,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Emotion Analysis App'),
+        automaticallyImplyLeading: false, // 禁用默认的返回按钮
         centerTitle: true,
         backgroundColor: Colors.white, // 导航栏背景为白色
         elevation: 0, // 去掉阴影

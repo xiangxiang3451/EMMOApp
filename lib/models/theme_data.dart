@@ -6,7 +6,8 @@ class AppTheme {
     brightness: Brightness.light,
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.blue,
-      titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+      titleTextStyle: TextStyle(
+          color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: Colors.blue,
@@ -32,7 +33,8 @@ class AppTheme {
     brightness: Brightness.dark,
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.black,
-      titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+      titleTextStyle: TextStyle(
+          color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: Colors.blue,

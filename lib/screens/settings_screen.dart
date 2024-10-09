@@ -10,6 +10,8 @@ import 'dart:convert';
 import 'package:provider/provider.dart'; // 导入 Provider 包
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
@@ -55,8 +57,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // 选择头像或拍照功能
   Future<void> _pickImage(ImageSource source) async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: source);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: source);
     if (image != null) {
       setState(() {
         _profileImage = image;
@@ -135,6 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('设置'),
+        automaticallyImplyLeading: false, // 禁用默认的返回按钮
       ),
       body: ListView(
         padding: const EdgeInsets.all(20.0),
@@ -155,13 +158,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
-                          errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                          errorBuilder: (BuildContext context, Object error,
+                              StackTrace? stackTrace) {
                             return Container(
                               color: Colors.red[200], // 背景颜色
                               child: const Center(
                                 child: Text(
                                   '图像加载失败',
-                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             );
