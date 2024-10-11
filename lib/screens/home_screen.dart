@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const EmotionAnalysisScreen(), // 实时情感分析页面
     const ReportScreen(), // 报告页面
     const HistoryScreen(), // 历史数据页面
-    SettingsScreen(), // 设置页面
+    const SettingsScreen(), // 设置页面
   ];
 
   // 页面切换方法

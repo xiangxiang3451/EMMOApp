@@ -1,12 +1,11 @@
 import 'package:emotion_recognition/models/constants.dart';
-import 'package:emotion_recognition/screens/emotion_analysis_screen.dart';
 import 'package:emotion_recognition/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async'; // 用于处理定时器
 import 'package:camera/camera.dart'; // 摄像头插件
 import 'package:http/http.dart' as http; // 用于API请求
 import 'dart:convert'; // 用于解析JSON数据
-import 'package:fl_chart/fl_chart.dart'; // 用于直方图展示
+import 'package:fl_chart/fl_chart.dart'; // 用于饼图展示
 
 class EmotionDetectionScreen extends StatefulWidget {
   const EmotionDetectionScreen({super.key});
@@ -22,6 +21,17 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
   String detectedEmotion = "None";
   Map<String, double>? probabilities;
   Timer? detectionTimer;
+
+  // 定义7种不同的颜色
+  final List<Color> emotionColors = [
+    Colors.red, // 第一种颜色
+    Colors.blue, // 第二种颜色
+    Colors.green, // 第三种颜色
+    Colors.orange, // 第四种颜色
+    Colors.purple, // 第五种颜色
+    Colors.yellow, // 第六种颜色
+    Colors.pink, // 第七种颜色
+  ];
 
   @override
   void initState() {
@@ -84,14 +94,12 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
 
   // 实时情感检测
   void startEmotionDetection() {
-    detectionTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    detectionTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        // **在这里也添加mounted检查**
         captureAndPredict();
       }
     });
     if (mounted) {
-      // **检查页面是否挂载**
       setState(() {
         isDetecting = true;
       });
@@ -124,56 +132,56 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
     super.dispose();
   }
 
-  // 构建直方图的组件
-  Widget _buildBarChart(Map<String, double> probabilities) {
-    return BarChart(
-      BarChartData(
-        barGroups: probabilities.entries.map((entry) {
-          return BarChartGroupData(
-            x: probabilities.keys.toList().indexOf(entry.key), // 根据情感标签设置X轴位置
-            barRods: [
-              BarChartRodData(
-                toY: entry.value * 100, // 转换为百分比展示
-                color: entry.value > 0.5
-                    ? Colors.green
-                    : Colors.orange, // 根据概率值动态改变颜色
-                width: 30, // 设置柱子的宽度
-                borderRadius: BorderRadius.circular(8), // 柱子的圆角
-              ),
-            ],
+  // 构建饼图的组件
+  Widget _buildPieChart(Map<String, double> probabilities) {
+    return PieChart(
+      PieChartData(
+        sections: probabilities.entries.map((entry) {
+          int index = probabilities.keys.toList().indexOf(entry.key);
+          return PieChartSectionData(
+            color: emotionColors[index % emotionColors.length], // 使用不同颜色
+            value: entry.value * 100, // 转换为百分比展示
+            title: '', // 不在饼图上显示百分比
+            radius: 60, // 饼图扇形的半径
+            titleStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           );
         }).toList(),
         borderData: FlBorderData(show: false), // 隐藏边框
-        titlesData: FlTitlesData(
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 40, // 为底部标题保留的空间
-              getTitlesWidget: (double value, TitleMeta meta) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0), // 调整垂直间距
-                  child: Text(
-                    probabilities.keys.elementAt(value.toInt()), // 显示情感标签
-                    style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.bold), // 字体加粗
-                  ),
-                );
-              },
-            ),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 40,
-              getTitlesWidget: (double value, TitleMeta meta) {
-                return Text('${value.toInt()}%',
-                    style: const TextStyle(fontSize: 12)); // 显示概率百分比
-              },
-            ),
-          ),
-        ),
-        gridData: const FlGridData(show: false), // 隐藏网格线
+        sectionsSpace: 2, // 扇形之间的空隙
+        centerSpaceRadius: 40, // 饼图中心的空白区域大小
       ),
+    );
+  }
+
+  // 构建图例
+  Widget _buildLegend(Map<String, double> probabilities) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: probabilities.entries.map((entry) {
+        int index = probabilities.keys.toList().indexOf(entry.key);
+        final color = emotionColors[index % emotionColors.length];
+        return Row(
+          children: [
+            Container(
+              width: 15,
+              height: 15,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color, // 设置图例的颜色
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              entry.key, // 显示情感名称
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 
@@ -188,7 +196,7 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
         children: <Widget>[
           // 调整摄像头预览的大小，让它占用较小的区域
           controller != null && controller!.value.isInitialized
-              ? Container(
+              ? SizedBox(
                   height: MediaQuery.of(context).size.height *
                       0.35, // 让摄像头预览占用屏幕的 35%
                   child: AspectRatio(
@@ -208,12 +216,29 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
 
           const SizedBox(height: 20),
 
-          // 实时更新的直方图，占据屏幕剩余的空间
+          // 饼图和图例展示
           probabilities != null
               ? Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: _buildBarChart(probabilities!),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // 饼图
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: _buildPieChart(probabilities!),
+                        ),
+                      ),
+                      // 图例
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 9.0),
+                          child: _buildLegend(probabilities!),
+                        ),
+                      ),
+                    ],
                   ),
                 )
               : const Text('等待检测...'),

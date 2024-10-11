@@ -23,7 +23,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Emotion Analysis App',
       theme: themeNotifier.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme, // 使用主题
-      home: LoginScreen(), // 启动时显示登录页面
+      home: const LoginScreen(), // 启动时显示登录页面
     );
   }
 }

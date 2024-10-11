@@ -77,7 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginScreen()), // 确保 LoginScreen 是你的登录页面
+          MaterialPageRoute(builder: (context) => const LoginScreen()), // 确保 LoginScreen 是你的登录页面
         );
       });
     } else {

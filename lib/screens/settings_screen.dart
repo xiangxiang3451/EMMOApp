@@ -120,7 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // 跳转回登录界面
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
     );
   }
 

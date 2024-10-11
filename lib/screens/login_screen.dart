@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
           (route) => false, // 这将移除所有的页面
         );
       });
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () {
                 // 导航到注册界面
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen()));
+                    MaterialPageRoute(builder: (context) => const RegisterScreen()));
               },
               child: const Text('没有账号？注册'),
             ),
