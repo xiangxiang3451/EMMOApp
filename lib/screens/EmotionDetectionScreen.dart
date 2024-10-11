@@ -1,12 +1,13 @@
 import 'package:emotion_recognition/models/constants.dart';
 import 'package:emotion_recognition/screens/home_screen.dart';
+import 'package:emotion_recognition/services/user.dart';
 import 'package:flutter/material.dart';
 import 'dart:async'; // 用于处理定时器
 import 'package:camera/camera.dart'; // 摄像头插件
 import 'package:http/http.dart' as http; // 用于API请求
 import 'dart:convert'; // 用于解析JSON数据
 import 'package:fl_chart/fl_chart.dart'; // 用于饼图展示
-
+import 'package:uuid/uuid.dart';  // 引入 uuid 包
 class EmotionDetectionScreen extends StatefulWidget {
   const EmotionDetectionScreen({super.key});
 
@@ -21,6 +22,9 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
   String detectedEmotion = "None";
   Map<String, double>? probabilities;
   Timer? detectionTimer;
+  List<Map<String, double>> emotionHistory = [];
+  DateTime? detectionStartTime;
+  var uuid = const Uuid();
 
   // 定义7种不同的颜色
   final List<Color> emotionColors = [
@@ -50,50 +54,49 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
   }
 
   // 捕获图像并发送到API进行情感分析
-  Future<void> captureAndPredict() async {
-    if (controller == null || !controller!.value.isInitialized) return;
+ Future<void> captureAndPredict() async {
+  if (controller == null || !controller!.value.isInitialized) return;
 
-    try {
-      // 拍照
-      final image = await controller!.takePicture();
-      final imagePath = image.path;
+  try {
+    final image = await controller!.takePicture();
+    final imagePath = image.path;
 
-      // 调用Flask API
-      final url = Uri.parse('$BackEndUrl/predict_emotion_video');
-      final request = http.MultipartRequest('POST', url)
-        ..files.add(await http.MultipartFile.fromPath('video', imagePath));
+    final url = Uri.parse('$BackEndUrl/predict_emotion_video');
+    final request = http.MultipartRequest('POST', url)
+      ..files.add(await http.MultipartFile.fromPath('video', imagePath));
 
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
 
-      if (response.statusCode == 200) {
-        final decodedResponse =
-            json.decode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 200) {
+      final decodedResponse = json.decode(response.body) as Map<String, dynamic>;
 
-        setState(() {
-          // 找出情感概率最大的标签
-          detectedEmotion = decodedResponse.keys.firstWhere((key) =>
-              decodedResponse[key] ==
-              decodedResponse.values
-                  .reduce((curr, next) => curr > next ? curr : next));
-          // 保存概率列表
-          probabilities = decodedResponse
-              .map((key, value) => MapEntry(key, value as double));
-        });
-      } else {
-        setState(() {
-          detectedEmotion = "Error in prediction";
-        });
-      }
-    } catch (e) {
       setState(() {
-        detectedEmotion = "Error: $e";
+        detectedEmotion = decodedResponse.keys.firstWhere((key) =>
+            decodedResponse[key] == decodedResponse.values.reduce((curr, next) => curr > next ? curr : next));
+
+        probabilities = decodedResponse.map((key, value) => MapEntry(key, value as double));
+
+        // 记录每次的情感概率
+        emotionHistory.add(probabilities!);
+      });
+    } else {
+      setState(() {
+        detectedEmotion = "Error in prediction";
       });
     }
+  } catch (e) {
+    setState(() {
+      detectedEmotion = "Error: $e";
+    });
   }
+}
+
 
   // 实时情感检测
   void startEmotionDetection() {
+    // 记录检测开始时间
+    detectionStartTime = DateTime.now();
     detectionTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         captureAndPredict();
@@ -106,25 +109,85 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
     }
   }
 
-  // 停止情感检测并关闭摄像头
-  void stopEmotionDetection() {
-    if (detectionTimer != null && detectionTimer!.isActive) {
-      detectionTimer!.cancel();
-    }
+  // // 停止情感检测并关闭摄像头
+  // void stopEmotionDetection() {
+  //   if (detectionTimer != null && detectionTimer!.isActive) {
+  //     detectionTimer!.cancel();
+  //   }
 
-    // 释放摄像头资源
-    if (controller != null) {
-      controller!.dispose();
-      controller = null; // 清空controller
-      isDetecting = false;
-    }
+  //   // 释放摄像头资源
+  //   if (controller != null) {
+  //     controller!.dispose();
+  //     controller = null; // 清空controller
+  //     isDetecting = false;
+  //   }
 
-    // 停止检测后返回上一个页面
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
+  //   // 停止检测后返回上一个页面
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => const HomeScreen()),
+  //   );
+  // }
+
+void stopEmotionDetection() {
+  if (detectionTimer != null && detectionTimer!.isActive) {
+    detectionTimer!.cancel();
   }
+
+  // 计算平均情绪
+  if (emotionHistory.isNotEmpty) {
+    Map<String, double> averageEmotion = {};
+    for (var entry in emotionHistory) {
+      entry.forEach((key, value) {
+        if (!averageEmotion.containsKey(key)) {
+          averageEmotion[key] = 0.0;
+        }
+        averageEmotion[key] = averageEmotion[key]! + value;
+      });
+    }
+
+    averageEmotion.updateAll((key, value) => value / emotionHistory.length);
+
+    // 计算检测时长
+    final analysisDuration = DateTime.now().difference(detectionStartTime!).inSeconds;
+
+    // 发送到后端
+    sendAverageEmotion(averageEmotion, analysisDuration);
+  }
+
+  if (controller != null) {
+    controller!.dispose();
+    controller = null;
+  }
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const HomeScreen()),
+  );
+}
+
+Future<void> sendAverageEmotion(Map<String, double> averageEmotion, int duration) async {
+  final url = Uri.parse('$BackEndUrl/save_emotion_analysis');
+  final analysisId = uuid.v4(); // 生成唯一分析ID
+  
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: json.encode({
+      "analysis_id": analysisId,
+      "user_id": User().userId,
+      "emotion_data": averageEmotion,
+      "analysis_duration": duration,
+      "analysis_timestamp": DateTime.now().toIso8601String(),
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print("Analysis saved successfully");
+  } else {
+    print("Error saving analysis: ${response.body}");
+  }
+}
 
   @override
   void dispose() {
