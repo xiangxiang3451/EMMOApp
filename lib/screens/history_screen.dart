@@ -27,13 +27,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> fetchEmotionHistory() async {
     // 从单例中获取当前用户ID
     String? userId = User().userId;
-    if (userId == null) {
-      // 如果用户ID为空，处理错误情况
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
 
     // 构造 POST 请求
     final response = await http.post(

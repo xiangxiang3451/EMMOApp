@@ -1,5 +1,6 @@
 // lib/screens/home_screen.dart
 
+import 'package:emotion_recognition/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'emotion_analysis_screen.dart';
 import 'report_screen.dart';
@@ -54,22 +55,22 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       // 底部导航栏
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
+        items:  <BottomNavigationBarItem>[
+          const BottomNavigationBarItem(
             icon: Icon(Icons.face),
             label: '情感分析',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.assessment),
             label: '报告',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.history),
             label: '历史数据',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '设置',
+            icon: const Icon(Icons.settings),
+            label: AppLocalizations.of(context)!.languageSettings,
           ),
         ],
         currentIndex: _selectedIndex,

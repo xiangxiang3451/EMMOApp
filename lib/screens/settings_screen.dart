@@ -1,9 +1,10 @@
+import 'package:emotion_recognition/l10n/gen/app_localizations.dart';
 import 'package:emotion_recognition/models/constants.dart';
+import 'package:emotion_recognition/services/language_notifier.dart';
 import 'package:emotion_recognition/services/theme_notifier.dart';
 import 'package:emotion_recognition/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'login_screen.dart'; // 导入登录界面
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -133,6 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     // 获取主题通知器
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final languageNotifier=Provider.of<LanguageNotifier>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -192,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(height: 40),
           _buildNotificationSection(),
           const Divider(height: 40),
-          _buildLanguageSection(),
+          _buildLanguageSection(languageNotifier),
           const Divider(height: 40),
           _buildThemeSection(themeNotifier), // 添加主题切换部分
         ],
@@ -239,20 +241,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // 语言设置部分
-  Widget _buildLanguageSection() {
-    return ListTile(
-      leading: const Icon(Icons.language),
-      title: const Text('语言设置'),
-      subtitle: const Text('切换应用语言'),
-      trailing: IconButton(
-        icon: const Icon(Icons.arrow_forward_ios),
-        onPressed: () {
-          // 跳转到语言设置界面
-        },
-      ),
-    );
-  }
+ // 语言设置部分
+Widget _buildLanguageSection(LanguageNotifier languageNotifier) {
+  return ListTile(
+    leading: const Icon(Icons.language),
+    title: Text(AppLocalizations.of(context)!.languageSettings), // 本地化文本
+    subtitle: Text(AppLocalizations.of(context)!.switchLanguage), // 本地化文本
+    trailing: IconButton(
+      icon: const Icon(Icons.arrow_forward_ios),
+      onPressed: () {
+        // 跳转到语言选择页面
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LanguageSettingsScreen(
+              // onLocaleChange: (locale) {
+                // 当选择语言时，更新语言设置
+                // MainAppState? state = context.findAncestorStateOfType<MainAppState>();
+                // state?.changeLanguage(locale);
+              // },
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
+
 
   // 主题设置部分
   Widget _buildThemeSection(ThemeNotifier themeNotifier) {
@@ -265,6 +280,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
         onChanged: (value) {
           themeNotifier.toggleTheme(); // 切换主题
         },
+      ),
+    );
+  }
+}
+// 语言设置界面，
+class LanguageSettingsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.languageSettings)),
+      body: Column(
+        children: [
+          ListTile(
+            title: const Text('English'),
+            onTap: () {
+              // 使用 Provider 更新语言
+              Provider.of<LanguageNotifier>(context, listen: false).changeLanguage(const Locale('en', ''));
+              Navigator.pop(context); // 切换语言后返回
+            },
+          ),
+          ListTile(
+            title: const Text('中文'),
+            onTap: () {
+              // 使用 Provider 更新语言
+              Provider.of<LanguageNotifier>(context, listen: false).changeLanguage(const Locale('zh', ''));
+              Navigator.pop(context); // 切换语言后返回
+            },
+          ),
+        ],
       ),
     );
   }
