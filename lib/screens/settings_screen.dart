@@ -254,12 +254,8 @@ Widget _buildLanguageSection(LanguageNotifier languageNotifier) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => LanguageSettingsScreen(
-              // onLocaleChange: (locale) {
-                // 当选择语言时，更新语言设置
-                // MainAppState? state = context.findAncestorStateOfType<MainAppState>();
-                // state?.changeLanguage(locale);
-              // },
+            builder: (context) => const LanguageSettingsScreen(
+             
             ),
           ),
         );
@@ -286,6 +282,8 @@ Widget _buildLanguageSection(LanguageNotifier languageNotifier) {
 }
 // 语言设置界面，
 class LanguageSettingsScreen extends StatelessWidget {
+  const LanguageSettingsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -11,5 +11,5 @@ class AppLocalizationsEn extends AppLocalizations {
   String get switchLanguage => 'switchLanguage';
 
   @override
-  String get settings => 'settings';
+  String settings() => 'settings';
 }
