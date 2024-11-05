@@ -1,6 +1,7 @@
 // lib/screens/home_screen.dart
 
 import 'package:emotion_recognition/l10n/gen/app_localizations.dart';
+import 'package:emotion_recognition/screens/calendar_screen.dart';
 import 'package:flutter/material.dart';
 import 'emotion_analysis_screen.dart';
 import 'report_screen.dart';
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 页面选项列表
   static final List<Widget> _widgetOptions = <Widget>[
-    const EmotionAnalysisScreen(), // 实时情感分析页面
+    const CalendarScreen(), // 实时情感分析页面
     const ReportScreen(), // 报告页面
     const HistoryScreen(), // 历史数据页面
     const SettingsScreen(), // 设置页面
@@ -35,21 +36,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Emotion Analysis App'),
-        automaticallyImplyLeading: false, // 禁用默认的返回按钮
-        centerTitle: true,
-        backgroundColor: Colors.white, // 导航栏背景为白色
-        elevation: 0, // 去掉阴影
-        titleTextStyle: const TextStyle(
-          color: Colors.black, // 标题文字为黑色
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.black, // 图标为黑色
-        ),
-      ),
+      // appBar: AppBar(
+      //   // title: const Text('Emotion Analysis App'),
+      //   automaticallyImplyLeading: false, // 禁用默认的返回按钮
+      //   centerTitle: true,
+      //   backgroundColor: Colors.white, // 导航栏背景为白色
+      //   elevation: 0, // 去掉阴影
+      //   titleTextStyle: const TextStyle(
+      //     color: Colors.black, // 标题文字为黑色
+      //     fontSize: 20,
+      //     fontWeight: FontWeight.bold,
+      //   ),
+      //   iconTheme: const IconThemeData(
+      //     color: Colors.black, // 图标为黑色
+      //   ),
+      // ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex), // 根据选中的索引显示相应页面
       ),
