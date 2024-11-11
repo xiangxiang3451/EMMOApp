@@ -61,7 +61,7 @@ class _EmotionDetectionScreenState extends State<EmotionDetectionScreen> {
     final image = await controller!.takePicture();
     final imagePath = image.path;
 
-    final url = Uri.parse('$BackEndUrl/predict_emotion_video');
+    final url = Uri.parse('$BackEndUrl/emotion/predict_emotion_video');
     final request = http.MultipartRequest('POST', url)
       ..files.add(await http.MultipartFile.fromPath('video', imagePath));
 
@@ -167,7 +167,7 @@ void stopEmotionDetection() {
 }
 
 Future<void> sendAverageEmotion(Map<String, double> averageEmotion, int duration) async {
-  final url = Uri.parse('$BackEndUrl/save_emotion_analysis');
+  final url = Uri.parse('$BackEndUrl/emotion/save_emotion_analysis');
   final analysisId = uuid.v4(); // 生成唯一分析ID
   
   final response = await http.post(

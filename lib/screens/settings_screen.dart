@@ -79,7 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('$BackEndUrl/upload_avatar'),
+        Uri.parse('$BackEndUrl/auth/upload_avatar'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           'user_id': userId,

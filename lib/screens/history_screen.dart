@@ -30,7 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     // 构造 POST 请求
     final response = await http.post(
-      Uri.parse('$BackEndUrl/emotion_history'),
+      Uri.parse('$BackEndUrl/emotion/emotion_history'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'user_id': userId}),
     );

@@ -24,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     
     // 发送验证码请求到 Flask 后端
     final response = await http.post(
-      Uri.parse('$BackEndUrl/register'), // 后端发送验证码的 URL
+      Uri.parse('$BackEndUrl/auth/register'), // 后端发送验证码的 URL
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({'email': email, 'password': _passwordController.text}), // 发送邮箱和密码
     );
@@ -52,7 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     // 发送验证码验证请求到 Flask 后端
     final response = await http.post(
-      Uri.parse('$BackEndUrl/verify_registration'), // 验证用户输入的验证码
+      Uri.parse('$BackEndUrl/auth/verify_registration'), // 验证用户输入的验证码
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         'email': email,

@@ -48,7 +48,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Future<void> _saveEmotion(DateTime date, String emotion) async {
     final userId = User().userId;  // 获取用户ID
     final response = await http.post(
-      Uri.parse('$BackEndUrl/emotions'), // 使用 POST 请求保存情绪
+      Uri.parse('$BackEndUrl/emotion/emotions'), // 使用 POST 请求保存情绪
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'userId': userId,

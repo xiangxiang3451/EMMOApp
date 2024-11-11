@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // 发送登录请求到 Flask 后端
     final response = await http.post(
-      Uri.parse('$BackEndUrl/login'), // 本地 Flask 后端 URL
+      Uri.parse('$BackEndUrl/auth/login'), // 本地 Flask 后端 URL
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         'email': email,
