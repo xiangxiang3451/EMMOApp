@@ -38,8 +38,8 @@ class _MoodScreenState extends State<MoodScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
+            const Padding(
+              padding: EdgeInsets.only(top: 30.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -47,7 +47,7 @@ class _MoodScreenState extends State<MoodScreen> {
                   SizedBox(width: 8),
                   Text(
                     '你现在的心情怎么样？',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.white),
                   ),
                 ],
               ),
@@ -57,12 +57,12 @@ class _MoodScreenState extends State<MoodScreen> {
               children: [
                 Text(
                   getCurrentDate(),
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   getCurrentWeekday(),
-                  style: TextStyle(fontSize: 20, color: Colors.grey),
+                  style: const TextStyle(fontSize: 20, color: Colors.grey),
                 ),
               ],
             ),
@@ -74,11 +74,11 @@ class _MoodScreenState extends State<MoodScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildCuteEye(),
-                    SizedBox(width: 40),
+                    const SizedBox(width: 40),
                     _buildCuteEye(),
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // 水平条形按钮区域（6个按钮）
                 Padding(
@@ -107,7 +107,7 @@ class _MoodScreenState extends State<MoodScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            padding: EdgeInsets.all(0), // 去掉默认内边距
+                            padding: const EdgeInsets.all(0), // 去掉默认内边距
                           ),
                           onPressed: () {
                             setState(() {
@@ -122,7 +122,7 @@ class _MoodScreenState extends State<MoodScreen> {
                 }),
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -144,7 +144,7 @@ class _MoodScreenState extends State<MoodScreen> {
             child: Container(
               width: 30,
               height: 30,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.black,
                 shape: BoxShape.circle,
               ),
@@ -156,7 +156,7 @@ class _MoodScreenState extends State<MoodScreen> {
             child: Container(
               width: 10,
               height: 10,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
@@ -168,7 +168,7 @@ class _MoodScreenState extends State<MoodScreen> {
             child: Container(
               width: 5,
               height: 5,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),

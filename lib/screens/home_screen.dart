@@ -2,7 +2,7 @@
 
 import 'package:emotion_recognition/l10n/gen/app_localizations.dart';
 import 'package:emotion_recognition/screens/calendar_screen.dart';
-import 'package:emotion_recognition/screens/recordEmo_screen';
+import 'package:emotion_recognition/screens/recordEmo_screen.dart';
 import 'package:flutter/material.dart';
 import 'report_screen.dart';
 import 'history_screen.dart';
