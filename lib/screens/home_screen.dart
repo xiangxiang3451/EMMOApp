@@ -1,5 +1,3 @@
-// lib/screens/home_screen.dart
-
 import 'package:emotion_recognition/l10n/gen/app_localizations.dart';
 import 'package:emotion_recognition/screens/calendar_screen.dart';
 import 'package:emotion_recognition/screens/recordEmo_screen.dart';
@@ -22,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const CalendarScreen(),
     const ReportScreen(), // 报告页面
     const HistoryScreen(), // 历史数据页面
-     MoodScreen(), // 设置页面
+    MoodScreen(), // 设置页面
   ];
 
   // 页面切换方法
@@ -30,6 +28,19 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+
+    // 判断点击的是否是 "语言设置" 项，如果是，显示 MoodScreen
+    if (index == 3) {
+      _openMoodScreen();
+    }
+  }
+
+  // 打开MoodScreen页面的方法
+  void _openMoodScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MoodScreen()), // 跳转到MoodScreen
+    );
   }
 
   @override
@@ -51,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('EMMO'),
         leading: IconButton(
           icon: const Icon(Icons.insert_emoticon), // 使用情绪图标
-          onPressed: () {},
+          onPressed: _openMoodScreen, // 用户点击时打开 MoodScreen 页面
         ),
       ),
 

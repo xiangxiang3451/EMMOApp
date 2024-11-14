@@ -34,6 +34,22 @@ class _MoodScreenState extends State<MoodScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: moodColors[selectedMood], // 根据选中的心情按钮改变背景色
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: () {
+              // 这里可以实现 "下一步" 的功能，例如导航到下一个页面
+              print("Next button pressed");
+            },
+            child: const Text(
+              '下一步',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,16 +59,15 @@ class _MoodScreenState extends State<MoodScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.mood, size: 30, color: Colors.blue),
+                  Icon(Icons.mood, size: 30, color: Colors.white),
                   SizedBox(width: 8),
                   Text(
                     '你现在的心情怎么样？',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.white),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ],
               ),
             ),
-
             Column(
               children: [
                 Text(
@@ -66,7 +81,6 @@ class _MoodScreenState extends State<MoodScreen> {
                 ),
               ],
             ),
-
             // 表情区域
             Column(
               children: [
@@ -79,15 +93,12 @@ class _MoodScreenState extends State<MoodScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
-                // 水平条形按钮区域（6个按钮）
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: _buildMouth(),
                 ),
               ],
             ),
-            
             // 这里添加六个按钮，根据点击的按钮改变背景色
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -183,8 +194,8 @@ class _MoodScreenState extends State<MoodScreen> {
   Widget _buildMouth() {
     double curveFactor = (selectedMood - 2.5) * 0.8; // 控制嘴型的弧度
     return Container(
-      width: 350,  // 增加嘴巴宽度
-      height: 60,
+      width: 400,  // 增加嘴巴宽度
+      height: 50,
       alignment: Alignment.center,
       child: CustomPaint(
         painter: MouthPainter(curveFactor),
