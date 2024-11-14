@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 页面选项列表
   static final List<Widget> _widgetOptions = <Widget>[
-    const CalendarScreen(), // 实时情感分析页面
+    const CalendarScreen(), 
     const ReportScreen(), // 报告页面
     const HistoryScreen(), // 历史数据页面
     const SettingsScreen(), // 设置页面
