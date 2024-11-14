@@ -76,8 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blueAccent, // 选中的项目为蓝色
-        unselectedItemColor: Colors.grey[700], // 未选中的项目为深灰色
-        backgroundColor: Colors.white, // 底部导航栏背景色为白色
+        unselectedItemColor: Colors.white, // 未选中的项目为深灰色
+        backgroundColor: const Color(0xFF3E4149), // 底部导航栏背景色为白色
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed, // 固定模式，确保未选中的图标保持原样
       ),
