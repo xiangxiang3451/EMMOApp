@@ -2,11 +2,10 @@
 
 import 'package:emotion_recognition/l10n/gen/app_localizations.dart';
 import 'package:emotion_recognition/screens/calendar_screen.dart';
+import 'package:emotion_recognition/screens/recordEmo_screen';
 import 'package:flutter/material.dart';
-import 'emotion_analysis_screen.dart';
 import 'report_screen.dart';
 import 'history_screen.dart';
-import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const CalendarScreen(),
     const ReportScreen(), // 报告页面
     const HistoryScreen(), // 历史数据页面
-    const SettingsScreen(), // 设置页面
+     MoodScreen(), // 设置页面
   ];
 
   // 页面切换方法

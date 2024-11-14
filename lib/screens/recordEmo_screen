@@ -1,0 +1,221 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class MoodScreen extends StatefulWidget {
+  @override
+  _MoodScreenState createState() => _MoodScreenState();
+}
+
+class _MoodScreenState extends State<MoodScreen> {
+  int selectedMood = 3; // 初始状态为“轻微开心”
+
+  List<Color> moodColors = [
+    Colors.blue[100]!,
+    Colors.green[100]!,
+    Colors.yellow[100]!,
+    Colors.orange[100]!,
+    Colors.pink[100]!,
+    Colors.purple[100]!,
+  ];
+
+  String getCurrentDate() {
+    final now = DateTime.now();
+    final formatter = DateFormat('yyyy-MM-dd HH:mm');
+    return formatter.format(now);
+  }
+
+  String getCurrentWeekday() {
+    final now = DateTime.now();
+    final formatter = DateFormat.EEEE('zh_CN');
+    return formatter.format(now);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: moodColors[selectedMood], // 根据选中的心情按钮改变背景色
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.mood, size: 30, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Text(
+                    '你现在的心情怎么样？',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+
+            Column(
+              children: [
+                Text(
+                  getCurrentDate(),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  getCurrentWeekday(),
+                  style: TextStyle(fontSize: 20, color: Colors.grey),
+                ),
+              ],
+            ),
+
+            // 表情区域
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildCuteEye(),
+                    SizedBox(width: 40),
+                    _buildCuteEye(),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                // 水平条形按钮区域（6个按钮）
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: _buildMouth(),
+                ),
+              ],
+            ),
+            
+            // 这里添加六个按钮，根据点击的按钮改变背景色
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(6, (index) {
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Container(
+                        height: 10, // 控制按钮的高度
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: selectedMood == index
+                                ? moodColors[index]
+                                : moodColors[index].withOpacity(0.7),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: EdgeInsets.all(0), // 去掉默认内边距
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              selectedMood = index;
+                            });
+                          },
+                          child: Container(), // 这里只显示颜色
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 可爱的眼睛Widget
+  Widget _buildCuteEye() {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.blue[300],
+        shape: BoxShape.circle,
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 15,
+            top: 10,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            right: 15,
+            bottom: 10,
+            child: Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 显示不同嘴型的Widget
+  Widget _buildMouth() {
+    double curveFactor = (selectedMood - 2.5) * 0.8; // 控制嘴型的弧度
+    return Container(
+      width: 350,  // 增加嘴巴宽度
+      height: 60,
+      alignment: Alignment.center,
+      child: CustomPaint(
+        painter: MouthPainter(curveFactor),
+      ),
+    );
+  }
+}
+
+// 自定义Painter绘制嘴型的横向弧度
+class MouthPainter extends CustomPainter {
+  final double curveFactor;
+  MouthPainter(this.curveFactor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 6
+      ..style = PaintingStyle.stroke;
+
+    final startX = 20.0;
+    final endX = size.width - 20.0;
+    final controlPoint = Offset(size.width / 2, size.height / 2 + curveFactor * 30);
+    final path = Path()
+      ..moveTo(startX, size.height / 2)
+      ..quadraticBezierTo(
+          controlPoint.dx, controlPoint.dy, endX, size.height / 2);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
