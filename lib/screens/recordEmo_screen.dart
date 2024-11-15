@@ -264,14 +264,7 @@ class NextPage extends StatelessWidget {
        actions: [
           TextButton(
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => NextPage(
-                  
-              //     ),
-              //   ),
-              // );
+              
             },
             child: const Text(
               '完成',
