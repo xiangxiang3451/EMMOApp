@@ -12,7 +12,7 @@ class _MoodScreenState extends State<MoodScreen> {
   List<Color> moodColors = [
     Colors.blue[100]!,
     Colors.green[100]!,
-    Colors.yellow[100]!,
+    Colors.red[100]!,
     Colors.orange[100]!,
     Colors.pink[100]!,
     Colors.purple[100]!,
@@ -40,8 +40,14 @@ class _MoodScreenState extends State<MoodScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              // 这里可以实现 "下一步" 的功能，例如导航到下一个页面
-              print("Next button pressed");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NextPage(
+                    backgroundColor: moodColors[selectedMood],
+                  ),
+                ),
+              );
             },
             child: const Text(
               '下一步',
@@ -229,4 +235,117 @@ class MouthPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+class NextPage extends StatelessWidget {
+  final Color backgroundColor;
+
+  NextPage({required this.backgroundColor});
+
+  String getCurrentDate() {
+    final now = DateTime.now();
+    final formatter = DateFormat('yyyy-MM-dd HH:mm');
+    return formatter.format(now);
+  }
+
+  String getCurrentWeekday() {
+    final now = DateTime.now();
+    final formatter = DateFormat.EEEE('zh_CN');
+    return formatter.format(now);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          '记录心情',
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            const Center(
+              child: Column(
+                children: [
+                  Icon(Icons.sentiment_satisfied, size: 50, color: Colors.white),
+                  SizedBox(height: 8),
+                  Text(
+                    '记录一下你的心情',
+                    style: TextStyle(fontSize: 16, color: Colors.white,fontWeight: FontWeight.bold, ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  getCurrentDate(),
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                Text(
+                  getCurrentWeekday(),
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              decoration: InputDecoration(
+                hintText: '自动获取地址或选择地址',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                // 添加照片功能逻辑
+              },
+              child: Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Icon(Icons.photo_camera, size: 30, color: Colors.white),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: '输入你的想法...',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 }

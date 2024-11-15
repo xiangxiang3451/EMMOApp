@@ -29,5 +29,4 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
-  # 添加代码生成（合成包）支持
   
