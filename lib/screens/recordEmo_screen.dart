@@ -51,7 +51,7 @@ class _MoodScreenState extends State<MoodScreen> {
             },
             child: const Text(
               '下一步',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: Colors.green, fontSize: 18,fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -261,10 +261,24 @@ class NextPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          '记录心情',
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
+       actions: [
+          TextButton(
+            onPressed: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => NextPage(
+                  
+              //     ),
+              //   ),
+              // );
+            },
+            child: const Text(
+              '完成',
+              style: TextStyle(color: Colors.green, fontSize: 18,fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -275,7 +289,7 @@ class NextPage extends StatelessWidget {
             const Center(
               child: Column(
                 children: [
-                  Icon(Icons.sentiment_satisfied, size: 50, color: Colors.white),
+                  Icon(Icons.mode, size: 50, color: Colors.grey),
                   SizedBox(height: 8),
                   Text(
                     '记录一下你的心情',
@@ -291,11 +305,11 @@ class NextPage extends StatelessWidget {
               children: [
                 Text(
                   getCurrentDate(),
-                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 Text(
                   getCurrentWeekday(),
-                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
             ),
