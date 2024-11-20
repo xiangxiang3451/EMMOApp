@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:emotion_recognition/models/constants.dart';
-import 'package:emotion_recognition/services/user.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+// import 'dart:convert';
 
 // 扩展 DateTime 类，添加 isSameDay 方法
 extension DateTimeComparison on DateTime {
   bool isSameDay(DateTime other) {
-    return this.year == other.year &&
-        this.month == other.month &&
-        this.day == other.day;
+    return year == other.year &&
+        month == other.month &&
+        day == other.day;
   }
 }
 
@@ -21,61 +18,61 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  late Map<DateTime, String> _selectedEmotions = {}; // 存储每个日期的情绪
+  late final Map<DateTime, String> _selectedEmotions = {}; // 存储每个日期的情绪
   late DateTime _selectedDate; // 当前选中的日期
   late DateTime _currentDate; // 当前日期
-  ScrollController _scrollController = ScrollController(); // 滚动控制器
+  final ScrollController _scrollController = ScrollController(); // 滚动控制器
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
     _currentDate = DateTime.now(); // 获取当前日期
-    _loadEmotions(); // 加载情绪数据
+    // _loadEmotions(); // 加载情绪数据
   }
 
-  // 从 Flask API 加载情绪数据
-  Future<void> _loadEmotions() async {
-    final userId = User().userId; // 获取用户ID
-    final response = await http.get(
-      Uri.parse('$BackEndUrl/emotions/$userId'), // 使用正确的 URL
-    );
+  // // 从 Flask API 加载情绪数据
+  // Future<void> _loadEmotions() async {
+  //   final userId = User().userId; // 获取用户ID
+  //   final response = await http.get(
+  //     Uri.parse('$BackEndUrl/emotions/$userId'), // 使用正确的 URL
+  //   );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body); // 解析数据
-      setState(() {
-        _selectedEmotions.clear(); // 清空之前的数据
-        data.forEach((dateStr, emotion) {
-          DateTime date = DateTime.parse(dateStr); // 解析日期
-          _selectedEmotions[date] = emotion; // 存储情绪数据
-        });
-      });
-    } else {
-      print('Failed to load emotions: ${response.body}');
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     final Map<String, dynamic> data = json.decode(response.body); // 解析数据
+  //     setState(() {
+  //       _selectedEmotions.clear(); // 清空之前的数据
+  //       data.forEach((dateStr, emotion) {
+  //         DateTime date = DateTime.parse(dateStr); // 解析日期
+  //         _selectedEmotions[date] = emotion; // 存储情绪数据
+  //       });
+  //     });
+  //   } else {
+  //     print('Failed to load emotions: ${response.body}');
+  //   }
+  // }
 
-  // 保存情绪数据到 Flask API
-  Future<void> _saveEmotion(DateTime date, String emotion) async {
-    final userId = User().userId; // 获取用户ID
-    final response = await http.post(
-      Uri.parse('$BackEndUrl/emotion/emotions'), // 使用 POST 请求保存情绪
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'userId': userId,
-        'date': date.toIso8601String(),
-        'emotion': emotion,
-      }),
-    );
+  // // 保存情绪数据到 Flask API
+  // Future<void> _saveEmotion(DateTime date, String emotion) async {
+  //   final userId = User().userId; // 获取用户ID
+  //   final response = await http.post(
+  //     Uri.parse('$BackEndUrl/emotion/emotions'), // 使用 POST 请求保存情绪
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: json.encode({
+  //       'userId': userId,
+  //       'date': date.toIso8601String(),
+  //       'emotion': emotion,
+  //     }),
+  //   );
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
-      setState(() {
-        _selectedEmotions[date] = emotion; // 更新情绪
-      });
-    } else {
-      print('Failed to save emotion: ${response.body}');
-    }
-  }
+  //   if (response.statusCode == 201 || response.statusCode == 200) {
+  //     setState(() {
+  //       _selectedEmotions[date] = emotion; // 更新情绪
+  //     });
+  //   } else {
+  //     print('Failed to save emotion: ${response.body}');
+  //   }
+  // }
 
   // 显示情绪选择对话框
   void _selectEmotion(DateTime date) {
@@ -104,7 +101,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pop();
-        _saveEmotion(date, emoji); // 保存选择的情绪
+        // _saveEmotion(date, emoji); // 保存选择的情绪
       },
       child: Text(emoji, style: const TextStyle(fontSize: 30)),
     );
@@ -175,7 +172,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             BoxShadow(
                               color: Colors.black.withOpacity(0.2),
                               blurRadius: 6,
-                              offset: Offset(0, 2), // 位置偏移
+                              offset: const Offset(0, 2), // 位置偏移
                             ),
                           ],
                         ),

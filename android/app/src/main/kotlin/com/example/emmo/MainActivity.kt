@@ -1,4 +1,4 @@
-package com.example.emotion_recognition
+package com.example.emmo
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "614072979653",
+    "project_id": "emmo-60ea0",
+    "storage_bucket": "emmo-60ea0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614072979653:android:b5805d4654e2d42c1fa0ac",
+        "android_client_info": {
+          "package_name": "com.example.emmo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUpJmm-W0Wwc5sQUu_S2CduDhzfKtRXI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,9 +1,10 @@
-import 'package:emotion_recognition/l10n/gen/app_localizations.dart';
-import 'package:emotion_recognition/screens/calendar_screen.dart';
-import 'package:emotion_recognition/screens/recordEmo_screen.dart';
+import 'package:emmo/screens/aitalk_screen.dart';
+import 'package:emmo/screens/calendar_screen.dart';
+import 'package:emmo/screens/mood_screen.dart';
+import 'package:emmo/screens/setting_screen.dart';
+import 'package:emmo/screens/statistics_screen.dart';
+import 'package:emmo/screens/visualizationNote.dart';
 import 'package:flutter/material.dart';
-import 'report_screen.dart';
-import 'history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,9 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
   // 页面选项列表
   static final List<Widget> _widgetOptions = <Widget>[
     const CalendarScreen(),
-    const ReportScreen(), // 报告页面
-    const HistoryScreen(), // 历史数据页面
-    MoodScreen(), // 设置页面
+    const AitalkScreen(), 
+    const Visualizationnote(), 
+    const StatisticsScreen(), 
+    const SettingScreen()
   ];
 
   // 页面切换方法
@@ -29,17 +31,17 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
 
-    // 判断点击的是否是 "语言设置" 项，如果是，显示 MoodScreen
-    if (index == 3) {
-      _openMoodScreen();
-    }
+    // // 判断点击的是否是 "语言设置" 项，如果是，显示 MoodScreen
+    // if (index == 3) {
+    //   _openMoodScreen();
+    // }
   }
 
   // 打开MoodScreen页面的方法
   void _openMoodScreen() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MoodScreen()), // 跳转到MoodScreen
+      MaterialPageRoute(builder: (context) => const MoodScreen()), // 跳转到MoodScreen
     );
   }
 
@@ -61,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         title: const Text('EMMO'),
         leading: IconButton(
-          icon: const Icon(Icons.insert_emoticon), // 使用情绪图标
+          icon: const Icon(Icons.mode), // 使用铅笔
           onPressed: _openMoodScreen, // 用户点击时打开 MoodScreen 页面
         ),
       ),
@@ -71,22 +73,26 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       // 底部导航栏
       bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.face),
-            label: '情感分析',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.assessment),
-            label: '报告',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: '历史数据',
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_day),
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.settings),
-            label: AppLocalizations.of(context)!.languageSettings,
+            icon: Icon(Icons.psychology),
+            label: 'Talk',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.museum),
+            label: 'Notes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.poll),
+            label: "Search",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings",
           ),
         ],
         currentIndex: _selectedIndex,
@@ -95,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF3E4149), // 底部导航栏背景色为白色
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed, // 固定模式，确保未选中的图标保持原样
+        iconSize: 20,
       ),
     );
   }

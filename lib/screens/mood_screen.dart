@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class MoodScreen extends StatefulWidget {
+  const MoodScreen({super.key});
+
   @override
   _MoodScreenState createState() => _MoodScreenState();
 }
@@ -26,7 +28,7 @@ class _MoodScreenState extends State<MoodScreen> {
 
   String getCurrentWeekday() {
     final now = DateTime.now();
-    final formatter = DateFormat.EEEE('zh_CN');
+    final formatter = DateFormat.EEEE('en_US');
     return formatter.format(now);
   }
 
@@ -50,7 +52,7 @@ class _MoodScreenState extends State<MoodScreen> {
               );
             },
             child: const Text(
-              '下一步',
+              'Next',
               style: TextStyle(color: Colors.green, fontSize: 18,fontWeight: FontWeight.bold),
             ),
           ),
@@ -68,7 +70,7 @@ class _MoodScreenState extends State<MoodScreen> {
                   Icon(Icons.mood, size: 30, color: Colors.white),
                   SizedBox(width: 8),
                   Text(
-                    '你现在的心情怎么样？',
+                    'How are you feeling now?',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ],
@@ -114,7 +116,7 @@ class _MoodScreenState extends State<MoodScreen> {
                   return Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Container(
+                      child: SizedBox(
                         height: 10, // 控制按钮的高度
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -222,7 +224,7 @@ class MouthPainter extends CustomPainter {
       ..strokeWidth = 6
       ..style = PaintingStyle.stroke;
 
-    final startX = 20.0;
+    const startX = 20.0;
     final endX = size.width - 20.0;
     final controlPoint = Offset(size.width / 2, size.height / 2 + curveFactor * 30);
     final path = Path()
@@ -240,7 +242,7 @@ class MouthPainter extends CustomPainter {
 class NextPage extends StatelessWidget {
   final Color backgroundColor;
 
-  NextPage({required this.backgroundColor});
+  const NextPage({super.key, required this.backgroundColor});
 
   String getCurrentDate() {
     final now = DateTime.now();
@@ -250,7 +252,7 @@ class NextPage extends StatelessWidget {
 
   String getCurrentWeekday() {
     final now = DateTime.now();
-    final formatter = DateFormat.EEEE('zh_CN');
+    final formatter = DateFormat.EEEE('en_US');
     return formatter.format(now);
   }
 
@@ -267,7 +269,7 @@ class NextPage extends StatelessWidget {
               
             },
             child: const Text(
-              '完成',
+              'Finish',
               style: TextStyle(color: Colors.green, fontSize: 18,fontWeight: FontWeight.bold),
             ),
           ),
@@ -285,7 +287,7 @@ class NextPage extends StatelessWidget {
                   Icon(Icons.mode, size: 50, color: Colors.grey),
                   SizedBox(height: 8),
                   Text(
-                    '记录一下你的心情',
+                    'Record your mood',
                     style: TextStyle(fontSize: 16, color: Colors.white,fontWeight: FontWeight.bold, ),
                     textAlign: TextAlign.center,
                   ),
@@ -339,7 +341,7 @@ class NextPage extends StatelessWidget {
             TextField(
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: '输入你的想法...',
+                hintText: 'Enter your thoughts...',
                 hintStyle: TextStyle(color: Colors.grey[400]),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.1),
