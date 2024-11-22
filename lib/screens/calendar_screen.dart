@@ -89,6 +89,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _emotionButton("😡", date),
               _emotionButton("😱", date),
               _emotionButton("😴", date),
+            
             ],
           ),
         );

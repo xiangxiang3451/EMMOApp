@@ -1,9 +1,12 @@
 buildscript {
+    ext.kotlin_version = '1.9.0'
     repositories {
         google()         // 添加 Google 仓库
         mavenCentral()   // 添加 Maven 中央仓库
     }
     dependencies {
+        classpath 'com.android.tools.build:gradle:7.5.0'  // 选择与 Kotlin 版本兼容的 Gradle 插件版本
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.android.tools.build:gradle:8.1.1'      // 确保版本最新
         classpath 'com.google.gms:google-services:4.3.15'    // Firebase Google 服务插件
     }
