@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:math';
+import 'package:emmo/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -166,127 +168,7 @@ class _MoodScreenState extends State<MoodScreen> {
   }
 }
 
-// class NextPage extends StatelessWidget {
-//   final Color backgroundColor;
 
-//   const NextPage({super.key, required this.backgroundColor});
-
-//   String getCurrentDate() {
-//     final now = DateTime.now();
-//     final formatter = DateFormat('yyyy-MM-dd HH:mm');
-//     return formatter.format(now);
-//   }
-
-//   String getCurrentWeekday() {
-//     final now = DateTime.now();
-//     final formatter = DateFormat.EEEE('en_US');
-//     return formatter.format(now);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: backgroundColor,
-//       appBar: AppBar(
-//         backgroundColor: Colors.transparent,
-//         elevation: 0,
-//         actions: [
-//           TextButton(
-//             onPressed: () {},
-//             child: const Text(
-//               'Finish',
-//               style: TextStyle(
-//                   color: Colors.green, fontSize: 18, fontWeight: FontWeight.bold),
-//             ),
-//           ),
-//         ],
-//       ),
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             const SizedBox(height: 10),
-//             const Center(
-//               child: Column(
-//                 children: [
-//                   Icon(Icons.mode, size: 50, color: Colors.grey),
-//                   SizedBox(height: 8),
-//                   Text(
-//                     'Record your mood',
-//                     style: TextStyle(
-//                         fontSize: 16,
-//                         color: Colors.white,
-//                         fontWeight: FontWeight.bold),
-//                     textAlign: TextAlign.center,
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             const SizedBox(height: 20),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   getCurrentDate(),
-//                   style: const TextStyle(fontSize: 14, color: Colors.grey),
-//                 ),
-//                 Text(
-//                   getCurrentWeekday(),
-//                   style: const TextStyle(fontSize: 14, color: Colors.grey),
-//                 ),
-//               ],
-//             ),
-//             const SizedBox(height: 20),
-//             TextField(
-//               decoration: InputDecoration(
-//                 hintText: '自动获取地址或选择地址',
-//                 hintStyle: TextStyle(color: Colors.grey[400]),
-//                 filled: true,
-//                 fillColor: Colors.white.withOpacity(0.1),
-//                 border: OutlineInputBorder(
-//                   borderRadius: BorderRadius.circular(12),
-//                   borderSide: BorderSide.none,
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 20),
-//             GestureDetector(
-//               onTap: () {
-//                 // 添加照片功能逻辑
-//               },
-//               child: Container(
-//                 height: 100,
-//                 decoration: BoxDecoration(
-//                   color: Colors.white.withOpacity(0.1),
-//                   borderRadius: BorderRadius.circular(12),
-//                 ),
-//                 child: const Center(
-//                   child: Icon(Icons.photo_camera, size: 30, color: Colors.white),
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 20),
-//             TextField(
-//               maxLines: 4,
-//               decoration: InputDecoration(
-//                 hintText: 'Enter your thoughts...',
-//                 hintStyle: TextStyle(color: Colors.grey[400]),
-//                 filled: true,
-//                 fillColor: Colors.white.withOpacity(0.1),
-//                 border: OutlineInputBorder(
-//                   borderRadius: BorderRadius.circular(12),
-//                   borderSide: BorderSide.none,
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 20),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 class NextPage extends StatefulWidget {
   final Color backgroundColor;
 
@@ -298,6 +180,13 @@ class NextPage extends StatefulWidget {
 
 class _NextPageState extends State<NextPage> {
   String _selectedAddress = "自动获取地址或选择地址"; // 显示选中的地址
+
+   @override
+  void initState() {
+    super.initState();
+    // 页面加载时自动获取位置
+    _getCurrentLocation();
+  }
   Future<void> _getPermission() async {
   LocationPermission permission;
 
@@ -321,32 +210,48 @@ class _NextPageState extends State<NextPage> {
   // 如果获取了权限，可以安全地调用位置方法
 }
 
-  // 获取当前位置并转换为地址
-  Future<void> _getCurrentLocation() async {
-    setState(() {
-      _selectedAddress = "正在获取位置...";
-    });
+ Future<void> _getCurrentLocation() async {
+  setState(() {
+    _selectedAddress = "正在获取位置...";
+  });
 
-    try {
-      await _getPermission();
-       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+  try {
+    // 创建LocationSettings对象
+    LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.bestForNavigation, // 设置为最佳导航精度
+      distanceFilter: 10, // 每当设备移动超过10米时更新位置
+    );
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+    // 获取当前位置
+    Position position = await Geolocator.getCurrentPosition(
+      locationSettings: locationSettings, // 使用LocationSettings
+    );
 
+    // 使用反向地理编码获取地址
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+
+    // 构造完整的地址信息
+    if (placemarks.isNotEmpty) {
+      Placemark place = placemarks.first;
       setState(() {
-        _selectedAddress = placemarks.first.street ?? "未知位置";
+        _selectedAddress =
+            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
       });
-    } catch (e) {
+    } else {
       setState(() {
-        _selectedAddress = "获取位置失败";
+        _selectedAddress = "未能解析地址";
       });
     }
+  } catch (e) {
+    // 错误处理
+    setState(() {
+      _selectedAddress = "获取位置失败: ${e.toString()}";
+    });
   }
+}
 
   // 打开地图选择页面
   Future<void> _openMapPicker() async {
@@ -473,12 +378,7 @@ class _NextPageState extends State<NextPage> {
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _getCurrentLocation, // 自动获取地址
-              child: const Text("自动获取地址"),
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
+                GestureDetector(
               onTap: () {
                 // 添加照片功能逻辑
               },
@@ -532,6 +432,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   void initState() {
     super.initState();
     _getInitialLocation();
+    // _getCurrentLocation();
   }
 
   Future<void> _getInitialLocation() async {
