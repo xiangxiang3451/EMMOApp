@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:math';
-import 'package:emmo/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -238,7 +236,7 @@ class _NextPageState extends State<NextPage> {
       Placemark place = placemarks.first;
       setState(() {
         _selectedAddress =
-            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+            "${place.street}, ${place.locality}";
       });
     } else {
       setState(() {
