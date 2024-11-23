@@ -253,28 +253,24 @@ class _NextPageState extends State<NextPage> {
 
   // 打开地图选择页面
   Future<void> _openMapPicker() async {
-    final selectedLocation = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LocationPickerScreen()),
-    );
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const LocationPickerScreen()),
+  );
 
-    if (selectedLocation != null && selectedLocation is LatLng) {
-      try {
-        List<Placemark> placemarks = await placemarkFromCoordinates(
-          selectedLocation.latitude,
-          selectedLocation.longitude,
-        );
+  // 处理返回的数据
+  if (result != null && result is Map<String, dynamic>) {
+    final LatLng? location = result['location'];
+    final String? address = result['address'];
 
-        setState(() {
-          _selectedAddress = placemarks.first.street ?? "未知位置";
-        });
-      } catch (e) {
-        setState(() {
-          _selectedAddress = "获取位置失败";
-        });
-      }
+    if (location != null && address != null) {
+      setState(() {
+        _selectedAddress = address; // 更新地址
+      });
     }
   }
+}
+
 
   // 获取当前日期
   String getCurrentDate() {
@@ -425,6 +421,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   LatLng? _selectedLocation;
   GoogleMapController? _mapController;
   bool _isLoading = true;
+  String _currentAddress = "点击地图上的位置以获取地址"; // 当前点击的地址
 
   @override
   void initState() {
@@ -471,11 +468,36 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     }
   }
 
-  void _onMapTapped(LatLng position) {
+  void _onMapTapped(LatLng position) async {
+  setState(() {
+    _selectedLocation = position;
+  });
+
+  // 使用 Geocoding 包反向地理编码获取地址
+  try {
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+
+    if (placemarks.isNotEmpty) {
+      Placemark place = placemarks.first;
+      String address = "${place.street}, ${place.locality}"; // 提取详细地址
+      setState(() {
+        _currentAddress = address; // 更新框中的地址显示
+      });
+    } else {
+      setState(() {
+        _currentAddress = "无法获取地址";
+      });
+    }
+  } catch (e) {
     setState(() {
-      _selectedLocation = position;
+      _currentAddress = "获取地址失败: ${e.toString()}";
     });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -494,29 +516,87 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           ),
         ],
       ),
+      // body: _isLoading
+      //     ? const Center(child: CircularProgressIndicator())
+      //     : _selectedLocation == null
+      //         ? const Center(
+      //             child: Text("无法获取当前位置，请检查权限设置。"),
+      //           )
+      //         : GoogleMap(
+      //             onMapCreated: (controller) => _mapController = controller,
+      //             initialCameraPosition: CameraPosition(
+      //               target: _selectedLocation!,
+      //               zoom: 15,
+      //             ),
+      //             myLocationEnabled: true,
+      //             onTap: _onMapTapped,
+      //             markers: _selectedLocation != null
+      //                 ? {
+      //                     Marker(
+      //                       markerId: const MarkerId("selected_location"),
+      //                       position: _selectedLocation!,
+      //                     )
+      //                   }
+      //                 : {},
+      //           ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _selectedLocation == null
-              ? const Center(
-                  child: Text("无法获取当前位置，请检查权限设置。"),
-                )
-              : GoogleMap(
-                  onMapCreated: (controller) => _mapController = controller,
-                  initialCameraPosition: CameraPosition(
-                    target: _selectedLocation!,
-                    zoom: 15,
+    ? const Center(child: CircularProgressIndicator())
+    : Column(
+        children: [
+          // 地址显示框
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    _currentAddress,
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  myLocationEnabled: true,
-                  onTap: _onMapTapped,
-                  markers: _selectedLocation != null
-                      ? {
-                          Marker(
-                            markerId: const MarkerId("selected_location"),
-                            position: _selectedLocation!,
-                          )
-                        }
-                      : {},
                 ),
+                IconButton(
+                  icon: const Icon(Icons.check, color: Colors.green),
+                  onPressed: () {
+                    if (_currentAddress != "点击地图上的位置以获取地址") {
+                      Navigator.pop(context, {
+                        'location': _selectedLocation,
+                        'address': _currentAddress,
+                      });
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("请选择一个位置")),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: GoogleMap(
+              onMapCreated: (controller) => _mapController = controller,
+              initialCameraPosition: CameraPosition(
+                target: _selectedLocation!,
+                zoom: 15,
+              ),
+              myLocationEnabled: true,
+              onTap: _onMapTapped,
+              markers: _selectedLocation != null
+                  ? {
+                      Marker(
+                        markerId: const MarkerId("selected_location"),
+                        position: _selectedLocation!,
+                      )
+                    }
+                  : {},
+            ),
+          ),
+        ],
+      ),
+
     );
   }
 }
