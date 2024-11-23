@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class MoodScreen extends StatefulWidget {
@@ -78,7 +81,9 @@ class _MoodScreenState extends State<MoodScreen> {
             child: const Text(
               'Next',
               style: TextStyle(
-                  color: Colors.green, fontSize: 18, fontWeight: FontWeight.bold),
+                  color: Colors.green,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -166,7 +171,6 @@ class _MoodScreenState extends State<MoodScreen> {
   }
 }
 
-
 class NextPage extends StatefulWidget {
   final Color backgroundColor;
 
@@ -178,99 +182,100 @@ class NextPage extends StatefulWidget {
 
 class _NextPageState extends State<NextPage> {
   String _selectedAddress = "自动获取地址或选择地址"; // 显示选中的地址
+  File? _selectedImage; // 存储选中或拍摄的照片
 
-   @override
+  @override
   void initState() {
     super.initState();
     // 页面加载时自动获取位置
     _getCurrentLocation();
   }
+
   Future<void> _getPermission() async {
-  LocationPermission permission;
+    LocationPermission permission;
 
-  // 检查是否已经授权
-  permission = await Geolocator.checkPermission();
+    // 检查是否已经授权
+    permission = await Geolocator.checkPermission();
 
-  // 如果未授权，发起请求
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.deniedForever) {
-      // 用户永久拒绝权限
-      throw Exception('Location permissions are permanently denied, we cannot request permissions.');
+    // 如果未授权，发起请求
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.deniedForever) {
+        // 用户永久拒绝权限
+        throw Exception(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
     }
+
+    if (permission == LocationPermission.denied) {
+      // 用户仅临时拒绝权限
+      throw Exception('Location permissions are denied');
+    }
+
+    // 如果获取了权限，可以安全地调用位置方法
   }
 
-  if (permission == LocationPermission.denied) {
-    // 用户仅临时拒绝权限
-    throw Exception('Location permissions are denied');
-  }
-
-  // 如果获取了权限，可以安全地调用位置方法
-}
-
- Future<void> _getCurrentLocation() async {
-  setState(() {
-    _selectedAddress = "正在获取位置...";
-  });
-
-  try {
-    // 创建LocationSettings对象
-    LocationSettings locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.bestForNavigation, // 设置为最佳导航精度
-      distanceFilter: 10, // 每当设备移动超过10米时更新位置
-    );
-
-    // 获取当前位置
-    Position position = await Geolocator.getCurrentPosition(
-      locationSettings: locationSettings, // 使用LocationSettings
-    );
-
-    // 使用反向地理编码获取地址
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      position.latitude,
-      position.longitude,
-    );
-
-    // 构造完整的地址信息
-    if (placemarks.isNotEmpty) {
-      Placemark place = placemarks.first;
-      setState(() {
-        _selectedAddress =
-            "${place.street}, ${place.locality}";
-      });
-    } else {
-      setState(() {
-        _selectedAddress = "未能解析地址";
-      });
-    }
-  } catch (e) {
-    // 错误处理
+  Future<void> _getCurrentLocation() async {
     setState(() {
-      _selectedAddress = "获取位置失败: ${e.toString()}";
+      _selectedAddress = "正在获取位置...";
     });
+
+    try {
+      // 创建LocationSettings对象
+      LocationSettings locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation, // 设置为最佳导航精度
+        distanceFilter: 10, // 每当设备移动超过10米时更新位置
+      );
+
+      // 获取当前位置
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: locationSettings, // 使用LocationSettings
+      );
+
+      // 使用反向地理编码获取地址
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      // 构造完整的地址信息
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        setState(() {
+          _selectedAddress = "${place.street}, ${place.locality}";
+        });
+      } else {
+        setState(() {
+          _selectedAddress = "未能解析地址";
+        });
+      }
+    } catch (e) {
+      // 错误处理
+      setState(() {
+        _selectedAddress = "获取位置失败: ${e.toString()}";
+      });
+    }
   }
-}
 
   // 打开地图选择页面
   Future<void> _openMapPicker() async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const LocationPickerScreen()),
-  );
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LocationPickerScreen()),
+    );
 
-  // 处理返回的数据
-  if (result != null && result is Map<String, dynamic>) {
-    final LatLng? location = result['location'];
-    final String? address = result['address'];
+    // 处理返回的数据
+    if (result != null && result is Map<String, dynamic>) {
+      final LatLng? location = result['location'];
+      final String? address = result['address'];
 
-    if (location != null && address != null) {
-      setState(() {
-        _selectedAddress = address; // 更新地址
-      });
+      if (location != null && address != null) {
+        setState(() {
+          _selectedAddress = address; // 更新地址
+        });
+      }
     }
   }
-}
-
 
   // 获取当前日期
   String getCurrentDate() {
@@ -286,6 +291,57 @@ class _NextPageState extends State<NextPage> {
     return formatter.format(now);
   }
 
+  Future<void> _pickImageFromCamera() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+    if (photo != null) {
+      File? croppedImage = await _cropImage(File(photo.path));
+      if (croppedImage != null) {
+        setState(() {
+          _selectedImage = croppedImage; // 保存裁剪后的图片
+        });
+      }
+    }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      File? croppedImage = await _cropImage(File(image.path));
+      if (croppedImage != null) {
+        setState(() {
+          _selectedImage = croppedImage; // 保存裁剪后的图片
+        });
+      }
+    }
+  }
+
+  Future<File?> _cropImage(File imageFile) async {
+    final croppedImage = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+      // cropStyle: CropStyle.rectangle, // 裁剪样式
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: '裁剪照片',
+          toolbarColor: Colors.blue,
+          toolbarWidgetColor: Colors.white,
+          hideBottomControls: false,
+          lockAspectRatio: true,
+          // 替换 aspectRatioPresets
+          initAspectRatio: CropAspectRatioPreset.square,
+        ),
+        IOSUiSettings(
+          title: '裁剪照片',
+          aspectRatioLockEnabled: true,
+          rectX: 0,
+          rectY: 0,
+        ),
+      ],
+    );
+    return croppedImage != null ? File(croppedImage.path) : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -299,7 +355,9 @@ class _NextPageState extends State<NextPage> {
             child: const Text(
               '完成',
               style: TextStyle(
-                  color: Colors.green, fontSize: 18, fontWeight: FontWeight.bold),
+                  color: Colors.green,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -349,7 +407,8 @@ class _NextPageState extends State<NextPage> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 12.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -372,9 +431,87 @@ class _NextPageState extends State<NextPage> {
               ),
             ),
             const SizedBox(height: 20),
-                GestureDetector(
+            GestureDetector(
               onTap: () {
-                // 添加照片功能逻辑
+                if (_selectedImage != null) {
+                  // 弹出照片卡片
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.all(16.0),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                _selectedImage!,
+                                fit: BoxFit.cover,
+                                height: 200,
+                                width: double.infinity,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedImage = null; // 删除照片
+                                });
+                                Navigator.pop(context); // 关闭弹窗
+                              },
+                              icon: const Icon(Icons.delete),
+                              label: const Text('删除照片'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  // 弹出底部选择框
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SafeArea(
+                        child: Wrap(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.camera_alt,
+                                  color: Colors.blue),
+                              title: const Text('拍摄照片'),
+                              onTap: () {
+                                Navigator.pop(context); // 关闭底部弹窗
+                                _pickImageFromCamera(); // 调用拍摄照片方法
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.photo_library,
+                                  color: Colors.green),
+                              title: const Text('从相册选择'),
+                              onTap: () {
+                                Navigator.pop(context); // 关闭底部弹窗
+                                _pickImageFromGallery(); // 调用相册选择方法
+                              },
+                            ),
+                            ListTile(
+                              leading:
+                                  const Icon(Icons.cancel, color: Colors.red),
+                              title: const Text('取消'),
+                              onTap: () {
+                                Navigator.pop(context); // 关闭底部弹窗
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
               },
               child: Container(
                 height: 100,
@@ -382,8 +519,19 @@ class _NextPageState extends State<NextPage> {
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Center(
-                  child: Icon(Icons.photo_camera, size: 30, color: Colors.white),
+                child: Center(
+                  child: _selectedImage != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            _selectedImage!,
+                            fit: BoxFit.cover,
+                            height: 100,
+                            width: 100,
+                          ),
+                        )
+                      : const Icon(Icons.photo_camera,
+                          size: 30, color: Colors.white),
                 ),
               ),
             ),
@@ -469,35 +617,34 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   void _onMapTapped(LatLng position) async {
-  setState(() {
-    _selectedLocation = position;
-  });
+    setState(() {
+      _selectedLocation = position;
+    });
 
-  // 使用 Geocoding 包反向地理编码获取地址
-  try {
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      position.latitude,
-      position.longitude,
-    );
+    // 使用 Geocoding 包反向地理编码获取地址
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
-    if (placemarks.isNotEmpty) {
-      Placemark place = placemarks.first;
-      String address = "${place.street}, ${place.locality}"; // 提取详细地址
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        String address = "${place.street}, ${place.locality}"; // 提取详细地址
+        setState(() {
+          _currentAddress = address; // 更新框中的地址显示
+        });
+      } else {
+        setState(() {
+          _currentAddress = "无法获取地址";
+        });
+      }
+    } catch (e) {
       setState(() {
-        _currentAddress = address; // 更新框中的地址显示
-      });
-    } else {
-      setState(() {
-        _currentAddress = "无法获取地址";
+        _currentAddress = "获取地址失败: ${e.toString()}";
       });
     }
-  } catch (e) {
-    setState(() {
-      _currentAddress = "获取地址失败: ${e.toString()}";
-    });
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -540,63 +687,64 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       //                 : {},
       //           ),
       body: _isLoading
-    ? const Center(child: CircularProgressIndicator())
-    : Column(
-        children: [
-          // 地址显示框
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               children: [
-                Expanded(
-                  child: Text(
-                    _currentAddress,
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
+                // 地址显示框
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _currentAddress,
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.black),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.check, color: Colors.green),
+                        onPressed: () {
+                          if (_currentAddress != "点击地图上的位置以获取地址") {
+                            Navigator.pop(context, {
+                              'location': _selectedLocation,
+                              'address': _currentAddress,
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("请选择一个位置")),
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.check, color: Colors.green),
-                  onPressed: () {
-                    if (_currentAddress != "点击地图上的位置以获取地址") {
-                      Navigator.pop(context, {
-                        'location': _selectedLocation,
-                        'address': _currentAddress,
-                      });
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("请选择一个位置")),
-                      );
-                    }
-                  },
+                Expanded(
+                  child: GoogleMap(
+                    onMapCreated: (controller) => _mapController = controller,
+                    initialCameraPosition: CameraPosition(
+                      target: _selectedLocation!,
+                      zoom: 15,
+                    ),
+                    myLocationEnabled: true,
+                    onTap: _onMapTapped,
+                    markers: _selectedLocation != null
+                        ? {
+                            Marker(
+                              markerId: const MarkerId("selected_location"),
+                              position: _selectedLocation!,
+                            )
+                          }
+                        : {},
+                  ),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: GoogleMap(
-              onMapCreated: (controller) => _mapController = controller,
-              initialCameraPosition: CameraPosition(
-                target: _selectedLocation!,
-                zoom: 15,
-              ),
-              myLocationEnabled: true,
-              onTap: _onMapTapped,
-              markers: _selectedLocation != null
-                  ? {
-                      Marker(
-                        markerId: const MarkerId("selected_location"),
-                        position: _selectedLocation!,
-                      )
-                    }
-                  : {},
-            ),
-          ),
-        ],
-      ),
-
     );
   }
 }
