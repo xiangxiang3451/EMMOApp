@@ -721,29 +721,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           ),
         ],
       ),
-      // body: _isLoading
-      //     ? const Center(child: CircularProgressIndicator())
-      //     : _selectedLocation == null
-      //         ? const Center(
-      //             child: Text("无法获取当前位置，请检查权限设置。"),
-      //           )
-      //         : GoogleMap(
-      //             onMapCreated: (controller) => _mapController = controller,
-      //             initialCameraPosition: CameraPosition(
-      //               target: _selectedLocation!,
-      //               zoom: 15,
-      //             ),
-      //             myLocationEnabled: true,
-      //             onTap: _onMapTapped,
-      //             markers: _selectedLocation != null
-      //                 ? {
-      //                     Marker(
-      //                       markerId: const MarkerId("selected_location"),
-      //                       position: _selectedLocation!,
-      //                     )
-      //                   }
-      //                 : {},
-      //           ),
+     
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(

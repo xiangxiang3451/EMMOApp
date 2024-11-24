@@ -30,50 +30,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _currentDate = DateTime.now(); // 获取当前日期
     // _loadEmotions(); // 加载情绪数据
   }
-
-  // // 从 Flask API 加载情绪数据
-  // Future<void> _loadEmotions() async {
-  //   final userId = User().userId; // 获取用户ID
-  //   final response = await http.get(
-  //     Uri.parse('$BackEndUrl/emotions/$userId'), // 使用正确的 URL
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     final Map<String, dynamic> data = json.decode(response.body); // 解析数据
-  //     setState(() {
-  //       _selectedEmotions.clear(); // 清空之前的数据
-  //       data.forEach((dateStr, emotion) {
-  //         DateTime date = DateTime.parse(dateStr); // 解析日期
-  //         _selectedEmotions[date] = emotion; // 存储情绪数据
-  //       });
-  //     });
-  //   } else {
-  //     print('Failed to load emotions: ${response.body}');
-  //   }
-  // }
-
-  // // 保存情绪数据到 Flask API
-  // Future<void> _saveEmotion(DateTime date, String emotion) async {
-  //   final userId = User().userId; // 获取用户ID
-  //   final response = await http.post(
-  //     Uri.parse('$BackEndUrl/emotion/emotions'), // 使用 POST 请求保存情绪
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: json.encode({
-  //       'userId': userId,
-  //       'date': date.toIso8601String(),
-  //       'emotion': emotion,
-  //     }),
-  //   );
-
-  //   if (response.statusCode == 201 || response.statusCode == 200) {
-  //     setState(() {
-  //       _selectedEmotions[date] = emotion; // 更新情绪
-  //     });
-  //   } else {
-  //     print('Failed to save emotion: ${response.body}');
-  //   }
-  // }
-
   // 显示情绪选择对话框
   void _selectEmotion(DateTime date) {
     showDialog(
