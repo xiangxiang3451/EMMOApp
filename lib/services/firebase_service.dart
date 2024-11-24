@@ -1,19 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emmo/authentication/authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   
-
-  // 获取当前登录的用户
-  User? getCurrentUser() {
-    return _auth.currentUser;
-  }
-
   // 获取 Firestore 中某个用户的数据
   Future<DocumentSnapshot> getUserData(String userId) async {
     return await _firestore.collection('users').doc(userId).get();
@@ -34,34 +29,6 @@ class FirebaseService {
       await _firestore.collection('users').doc(userId).set(data);
     } catch (e) {
       print("Error adding new user: $e");
-    }
-  }
-
-  // 注册新用户（使用 Firebase Authentication）
-  Future<User?> registerUserWithEmailPassword(String email, String password) async {
-    try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return userCredential.user;
-    } catch (e) {
-      print("Error registering user: $e");
-      return null;
-    }
-  }
-
-  // 用户登录
-  Future<User?> loginUserWithEmailPassword(String email, String password) async {
-    try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return userCredential.user;
-    } catch (e) {
-      print("Error logging in user: $e");
-      return null;
     }
   }
 
@@ -111,7 +78,7 @@ class FirebaseService {
     }
   }
 
-  // 注册新用户
+  // 注册/登录新用户
   Future<bool> registerNewUser(String email) async {
     try {
       final userRef = _firestore.collection('users').doc(email);
@@ -126,54 +93,55 @@ class FirebaseService {
     }
   }
 
- // 上传图片到 Firebase Storage
-  Future<String?> uploadImage(File imageFile) async {
-    try {
-      // 生成存储路径
-      String fileName = 'images/${DateTime.now().millisecondsSinceEpoch}';
-      Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = storageReference.putFile(imageFile);
-      TaskSnapshot snapshot = await uploadTask;
-      return await snapshot.ref.getDownloadURL(); // 返回图片的下载 URL
-    } catch (e) {
-      print('Error uploading image: $e');
-      return null;
-    }
-  }
 
-   // 保存心情记录到 Firestore
-  Future<void> saveMoodRecord({
-    required String address, // 用户选择的地址
-    required String moodText, // 用户的心情想法
-    required String imageUrl, // 图片 URL（从 Firebase Storage 获取）
-    required String date, // 当前日期
-    required String weekday, // 当前星期
+   /// 将情绪记录保存到 Firestore
+  Future<void> saveEmotionRecord({
+    required String address,
+    required String thoughts,
+    required String date,
+    required String weekday,
+    required String expression,
+    required Color color,
+    File? photoFile, // 可选图片
   }) async {
     try {
-      User? user = _auth.currentUser;
-      if (user == null) {
-        print("No user is currently logged in.");
-        return;
+      // 获取当前用户
+        String? currentUserEmail = AuthenticationService.currentUserEmail;
+
+      if (currentUserEmail == null) {
+        throw Exception("用户未登录，无法保存记录。");
       }
 
-      // 获取当前用户的 ID
-      String userId = user.uid;
+      // 将图片编码为 Base64 字符串（如果存在）
+      String? base64Image;
+      if (photoFile != null) {
+        List<int> imageBytes = await photoFile.readAsBytes();
+        base64Image = base64Encode(imageBytes);
+      }
 
-      // 将心情记录添加到 `record` 集合
-      await _firestore.collection('records').add({
-        'user_id': userId,
+      // 构建记录数据
+      final Map<String, dynamic> recordData = {
+        'userId': currentUserEmail, // 当前用户ID
         'address': address,
-        'mood_text': moodText,
-        'image_url': imageUrl, // 存储图片的 URL
+        'thoughts': thoughts,
         'date': date,
         'weekday': weekday,
-        'timestamp': FieldValue.serverTimestamp(), // 自动添加服务器时间戳
-      });
+        'time': DateTime.now().toIso8601String(),
+        'photo': base64Image, // 图片编码（如果有）
+        'expression':expression,
+        'color':color.value,
+      };
 
-      print("Mood record saved successfully!");
-    } catch (e) {
-      print("Error saving mood record: $e");
+      // 保存到 Firestore 的 "record" 集合
+      await _firestore.collection('record').add(recordData);
+    } catch (e,stackTrace) {
+      print("保存记录时出错: $e");
+
+    // 抛出详细的异常信息
+    throw Exception("无法保存情绪记录：$e\nStack Trace: $stackTrace");
     }
   }
+
+ 
 
 }

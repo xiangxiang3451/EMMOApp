@@ -6,7 +6,8 @@ import 'package:mailer/smtp_server.dart';
 
 class AuthenticationService {
   static final FirebaseService _firebaseService = FirebaseService();
-
+ // 全局变量，保存当前的登录用户
+  static String? currentUserEmail; 
   // 生成验证码并发送邮件
   static Future<bool> sendVerificationCode(String email) async {
     try {

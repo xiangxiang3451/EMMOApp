@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:emmo/screens/home_screen.dart';
+import 'package:emmo/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -73,7 +75,8 @@ class _MoodScreenState extends State<MoodScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => NextPage(
-                    backgroundColor: moodColors[selectedMood],
+                    selectedEmotion: emotions[selectedMood], // 传递表情
+                    selectedColor: moodColors[selectedMood], // 传递颜色,
                   ),
                 ),
               );
@@ -172,9 +175,11 @@ class _MoodScreenState extends State<MoodScreen> {
 }
 
 class NextPage extends StatefulWidget {
-  final Color backgroundColor;
+  final String selectedEmotion; // 接收表情
+  final Color selectedColor; // 接收颜色
 
-  const NextPage({super.key, required this.backgroundColor});
+  const NextPage(
+      {super.key, required this.selectedEmotion, required this.selectedColor});
 
   @override
   State<NextPage> createState() => _NextPageState();
@@ -183,6 +188,7 @@ class NextPage extends StatefulWidget {
 class _NextPageState extends State<NextPage> {
   String _selectedAddress = "自动获取地址或选择地址"; // 显示选中的地址
   File? _selectedImage; // 存储选中或拍摄的照片
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
@@ -342,16 +348,67 @@ class _NextPageState extends State<NextPage> {
     return croppedImage != null ? File(croppedImage.path) : null;
   }
 
+  Future<void> _onSaveButtonPressed() async {
+    final firebaseService = FirebaseService();
+
+    try {
+      // 收集数据
+      final String address = _selectedAddress;
+      final String thoughts = _textController.text.trim();
+      final String date = getCurrentDate();
+      final String weekday = getCurrentWeekday();
+      final File? photo = _selectedImage;
+      final String expression =
+          widget.selectedEmotion; // 假设 selectedEmotion 已经被选中
+      final Color expressionColor =
+          widget.selectedColor; // 假设 selectedColor 已经被选中
+
+      // 调用 FirebaseService 存储记录
+      await firebaseService.saveEmotionRecord(
+        address: address,
+        thoughts: thoughts,
+        date: date,
+        weekday: weekday,
+        photoFile: photo,
+        expression: expression,
+        color: expressionColor,
+      );
+
+      // 提示成功
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('记录保存成功！')),
+      );
+
+      // 清空表单
+      setState(() {
+        _selectedAddress = "自动获取地址或选择地址";
+        _selectedImage = null;
+        _textController.clear();
+      });
+      // 跳转到目标界面（HomePage）
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const HomeScreen()), // 跳转到 HomePage
+      );
+    } catch (e) {
+      // 显示错误信息
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('保存失败：$e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: widget.backgroundColor,
+      backgroundColor: widget.selectedColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: _onSaveButtonPressed,
             child: const Text(
               '完成',
               style: TextStyle(
@@ -537,6 +594,7 @@ class _NextPageState extends State<NextPage> {
             ),
             const SizedBox(height: 20),
             TextField(
+              controller: _textController,
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: '输入你的想法...',
