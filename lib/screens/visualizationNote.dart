@@ -65,81 +65,89 @@ class _VisualizationnoteState extends State<Visualizationnote> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: records.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: records.length,
-              itemBuilder: (context, index) {
-                final record = records[index];
-                final expression = record['expression'];
-                final colorValue = record['color'];
+      body: Container(
+        color: Colors.white.withOpacity(0.8), // 设置背景色为半透明亮色
+        child: records.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                itemCount: records.length,
+                itemBuilder: (context, index) {
+                  final record = records[index];
+                  final expression = record['expression'];
+                  final colorValue = record['color'];
 
-                final color =
-                    colorValue is int ? Color(colorValue) : Colors.transparent;
-                final date = record['date'];
-                final address = record['address'];
-                final thoughts = record['thoughts'];
-                final photoBase64 = record['photo'];
+                  final color = colorValue is int
+                      ? Color(colorValue)
+                      : Colors.transparent;
+                  final date = record['date'];
+                  final address = record['address'];
+                  final thoughts = record['thoughts'];
+                  final photoBase64 = record['photo'];
 
-                return InkWell(
-                  onTap: () {
-                    _showRecordDetails(context, record);
-                  },
-                  child: Card(
-                    color: color,
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 0, horizontal: 0),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      height: 120, // 固定高度
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: color,
-                            radius: 30,
-                            child: Text(
-                              expression,
-                              style: const TextStyle(fontSize: 24),
+                  return InkWell(
+                    onTap: () {
+                      _showRecordDetails(context, record);
+                    },
+                    child: Card(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero, // 设置为无圆角
+                      ),
+                      color: color,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 0),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        height: 110, // 固定高度
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: color,
+                              radius: 30,
+                              child: Text(
+                                expression,
+                                style: const TextStyle(fontSize: 24),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  date,
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '地址: $address',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '备注: $thoughts',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ],
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    date,
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '地址: $address',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '备注: $thoughts',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
+      ),
     );
   }
+
   void _showRecordDetails(BuildContext context, Map<String, dynamic> record) {
     final expression = record['expression'];
     final colorValue = record['color'];

@@ -35,18 +35,18 @@ class _MoodScreenState extends State<MoodScreen> {
   ];
 
   List<Color> moodColors = [
-    Colors.blue[100]!,
-    Colors.green[100]!,
-    Colors.red[100]!,
-    Colors.orange[100]!,
-    Colors.pink[100]!,
-    Colors.purple[100]!,
-    Colors.yellow[100]!,
-    Colors.cyan[100]!,
-    Colors.teal[100]!,
-    Colors.brown[100]!,
-    Colors.lime[100]!,
-    Colors.amber[100]!,
+    Colors.blue[200]!,
+    Colors.green[200]!,
+    Colors.red[200]!,
+    Colors.orange[200]!,
+    Colors.pink[200]!,
+    Colors.purple[200]!,
+    Colors.yellow[200]!,
+    Colors.cyan[200]!,
+    Colors.teal[200]!,
+    Colors.brown[200]!,
+    Colors.lime[200]!,
+    Colors.amber[200]!,
   ];
 
   String getCurrentDate() {
