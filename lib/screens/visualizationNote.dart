@@ -17,7 +17,6 @@ class _VisualizationnoteState extends State<Visualizationnote> {
   Future<void> _getRecords() async {
     String? userId = AuthenticationService.currentUserEmail;
     if (userId == null) {
-      // 如果用户未登录，使用 SchedulerBinding 延迟调用显示 SnackBar
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('用户未登录！')),
@@ -49,7 +48,6 @@ class _VisualizationnoteState extends State<Visualizationnote> {
         }).toList();
       });
     } catch (e) {
-      // 错误处理
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error fetching records: $e')),
@@ -68,15 +66,14 @@ class _VisualizationnoteState extends State<Visualizationnote> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: records.isEmpty
-          ? const Center(child: CircularProgressIndicator()) // 显示加载状态
+          ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               itemCount: records.length,
               itemBuilder: (context, index) {
                 final record = records[index];
                 final expression = record['expression'];
-                final colorValue = record['color']; // 获取 color 值（整数）
+                final colorValue = record['color'];
 
-                // 确保 colorValue 是整数类型，然后传递给 Color 构造函数
                 final color =
                     colorValue is int ? Color(colorValue) : Colors.transparent;
                 final date = record['date'];
@@ -84,41 +81,127 @@ class _VisualizationnoteState extends State<Visualizationnote> {
                 final thoughts = record['thoughts'];
                 final photoBase64 = record['photo'];
 
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      backgroundColor: color,
-                      child: Text(
-                        expression,
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                    ),
-                    title: Text(date),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('地址: $address'),
-                        const SizedBox(height: 4),
-                        Text('备注: $thoughts'),
-                        if (photoBase64 != null && photoBase64.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          // 显示图片（如果有）
-                          Image.memory(
-                            base64Decode(photoBase64),
-                            height: 100,
-                            width: 100,
-                            fit: BoxFit.cover,
+                return InkWell(
+                  onTap: () {
+                    _showRecordDetails(context, record);
+                  },
+                  child: Card(
+                    color: color,
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 0, horizontal: 0),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      height: 120, // 固定高度
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: color,
+                            radius: 30,
+                            child: Text(
+                              expression,
+                              style: const TextStyle(fontSize: 24),
+                            ),
                           ),
-                        ]
-                      ],
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  date,
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '地址: $address',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '备注: $thoughts',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
               },
             ),
+    );
+  }
+  void _showRecordDetails(BuildContext context, Map<String, dynamic> record) {
+    final expression = record['expression'];
+    final colorValue = record['color'];
+    final color = colorValue is int ? Color(colorValue) : Colors.transparent;
+    final date = record['date'];
+    final address = record['address'];
+    final thoughts = record['thoughts'];
+    final photoBase64 = record['photo'];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('$expression'),
+        backgroundColor: color,
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text('日期: '),
+                  Text(
+                    date,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  const Text('地址: '),
+                  Expanded(child: Text(address)),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  const Text('备注: '),
+                  Expanded(child: Text(thoughts)),
+                ],
+              ),
+              if (photoBase64 != null && photoBase64.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Center(
+                  child: Image.memory(
+                    base64Decode(photoBase64),
+                    height: 150,
+                    width: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('close'),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -141,7 +141,4 @@ class FirebaseService {
     throw Exception("无法保存情绪记录：$e\nStack Trace: $stackTrace");
     }
   }
-
- 
-
 }
