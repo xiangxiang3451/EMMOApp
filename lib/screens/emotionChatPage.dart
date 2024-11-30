@@ -9,28 +9,63 @@ class EmotionChatPage extends StatefulWidget {
 class _EmotionChatPageState extends State<EmotionChatPage> {
   final GPTService _gptService = GPTService();
   final TextEditingController _controller = TextEditingController();
-  String _response = '';
+  final ScrollController _scrollController = ScrollController();
+
+  // 聊天记录，初始化 system 提示
+  final List<Map<String, String>> _chatHistory = [
+    {
+      'role': 'system',
+      'content': 'You are a helpful assistant specialized in managing emotions.'
+    },
+  ];
 
   void _sendMessage() async {
     final userInput = _controller.text;
     if (userInput.isEmpty) return;
 
+    // 添加用户输入到聊天历史
     setState(() {
-      _response = 'Loading...';
+      _chatHistory.add({'role': 'user', 'content': userInput});
+      _controller.clear(); // 清空输入框内容
     });
 
+    // 滚动到底部以查看最新消息
+    _scrollToBottom();
+
     try {
-      final reply = await _gptService.getEmotionResponse(userInput);
+      final reply = await _gptService.getEmotionResponse(_chatHistory);
+
       setState(() {
-        _response = reply;
+        _chatHistory.add({'role': 'assistant', 'content': reply}); // 添加 GPT 回复到聊天历史
       });
+
+      // 滚动到底部
+      _scrollToBottom();
     } catch (error) {
       setState(() {
-        _response = 'Error: $error';
+        _chatHistory.add({
+          'role': 'assistant',
+          'content': 'Error: $error',
+        });
       });
     }
+  }
 
-    _controller.clear();
+  void _scrollToBottom() {
+    Future.delayed(Duration(milliseconds: 100), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -41,22 +76,49 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                labelText: 'Enter your feelings',
-                border: OutlineInputBorder(),
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: _chatHistory.length,
+                itemBuilder: (context, index) {
+                  final message = _chatHistory[index];
+                  final isUser = message['role'] == 'user';
+                  return Align(
+                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isUser ? Colors.blue : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        message['content']!,
+                        style: TextStyle(color: isUser ? Colors.white : Colors.black),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _sendMessage,
-              child: const Text('Send'),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              _response,
-              style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter your feelings',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _sendMessage,
+                  child: const Text('Send'),
+                ),
+              ],
             ),
           ],
         ),
