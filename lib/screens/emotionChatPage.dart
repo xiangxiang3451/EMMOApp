@@ -52,10 +52,10 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
   }
 
   void _scrollToBottom() {
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     });
@@ -71,7 +71,6 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Emotion Chat')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
