@@ -1,5 +1,5 @@
-import 'package:emmo/screens/aitalk_screen.dart';
 import 'package:emmo/screens/calendar_screen.dart';
+import 'package:emmo/screens/emotionChatPage.dart';
 import 'package:emmo/screens/mood_screen.dart';
 import 'package:emmo/screens/setting_screen.dart';
 import 'package:emmo/screens/statistics_screen.dart';
@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // 页面选项列表
   static final List<Widget> _widgetOptions = <Widget>[
     const CalendarScreen(),
-    const AitalkScreen(), 
+    EmotionChatPage(), 
     const Visualizationnote(), 
     const StatisticsScreen(), 
     const SettingScreen()

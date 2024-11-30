@@ -22,7 +22,8 @@ dependencies:
   geocoding: ^3.0.0
   google_maps_flutter: ^2.10.0
   image_picker: ^1.0.0
-  image_cropper: ^3.0.3
+  image_cropper: ^8.0.2
+  http: ^1.2.2
 
 
 dev_dependencies:
