@@ -33,6 +33,40 @@ class GPTService {
     }
   }
 
+  Future<String> summarizeChat(List<Map<String, String>> chatHistory) async {
+    const apiUrl = 'https://sg.uiuiapi.com/v1/chat/completions';
+
+    // 截断聊天记录
+    final truncatedHistory = _truncateChatHistory(chatHistory);
+
+    // 添加总结提示
+    truncatedHistory.add({
+      'role': 'system',
+      'content': 'Please summarize the following conversation in the language it was written in and use you to call the user'
+    });
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $_apiKey',
+      },
+      body: jsonEncode({
+        'model': 'gpt-4',
+        'messages': truncatedHistory,
+        'max_tokens': 500,
+        'temperature': 0.7,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+      return data['choices'][0]['message']['content'];
+    } else {
+      throw Exception('Failed to summarize chat: ${utf8.decode(response.bodyBytes)}');
+    }
+  }
+
   List<Map<String, String>> _truncateChatHistory(List<Map<String, String>> history) {
     const maxTokens = 3000; // 模型支持的最大 token，留出一定余量
     int currentTokens = 0;

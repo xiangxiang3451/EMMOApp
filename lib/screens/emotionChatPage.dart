@@ -19,9 +19,12 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
     },
     {
       'role': 'assistant',
-      'content': 'Hello!How are you feeling now?',
+      'content': 'Hello! How are you feeling now?',
     },
   ];
+
+  // 控制输入框和按钮的显示状态
+  bool _isInputVisible = true;
 
   void _sendMessage() async {
     final userInput = _controller.text;
@@ -31,6 +34,7 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
     setState(() {
       _chatHistory.add({'role': 'user', 'content': userInput});
       _controller.clear(); // 清空输入框内容
+      _isInputVisible = false; // 隐藏输入框
     });
 
     // 滚动到底部以查看最新消息
@@ -64,6 +68,36 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
         curve: Curves.easeOut,
       );
     });
+  }
+
+  void _continueConversation() {
+    setState(() {
+      _isInputVisible = true; // 显示输入框
+    });
+  }
+
+  void _endAndSummarizeConversation() async {
+    try {
+      // 请求 GPT 总结聊天内容
+      final summary = await _gptService.summarizeChat(_chatHistory);
+
+      setState(() {
+        _chatHistory.add({
+          'role': 'assistant',
+          'content': '$summary',
+        });
+      });
+
+      // 滚动到底部以查看总结
+      _scrollToBottom();
+    } catch (error) {
+      setState(() {
+        _chatHistory.add({
+          'role': 'assistant',
+          'content': 'Error summarizing conversation: $error',
+        });
+      });
+    }
   }
 
   @override
@@ -112,24 +146,39 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter your feelings',
-                      border: OutlineInputBorder(),
+            if (_isInputVisible)
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter your feelings',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: _sendMessage,
-                  child: const Text('Send'),
-                ),
-              ],
-            ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: _sendMessage,
+                    child: const Text('Send'),
+                  ),
+                ],
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: _continueConversation,
+                    child: const Text('Continue'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _endAndSummarizeConversation,
+                    child: const Text('End & Summarize'),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
