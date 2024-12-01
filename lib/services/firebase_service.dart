@@ -140,5 +140,21 @@ class FirebaseService {
     // 抛出详细的异常信息
     throw Exception("无法保存情绪记录：$e\nStack Trace: $stackTrace");
     }
+
   }
+  Future<void> saveChatSummary(String userEmail, String summary) async {
+    String? currentUserEmail = AuthenticationService.currentUserEmail;
+
+    try {
+      final now = DateTime.now();
+      await _firestore.collection('chatSummaries').add({
+        'userId': currentUserEmail,
+        'summary': summary,
+        'timestamp': now.toIso8601String(),
+      });
+    } catch (error) {
+      throw Exception('Failed to save chat summary: $error');
+    }
+  }
+
 }

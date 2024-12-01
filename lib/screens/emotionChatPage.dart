@@ -1,4 +1,6 @@
+import 'package:emmo/authentication/authentication_service.dart';
 import 'package:emmo/services/gpt_service.dart';
+import 'package:emmo/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 
 class EmotionChatPage extends StatefulWidget {
@@ -8,10 +10,11 @@ class EmotionChatPage extends StatefulWidget {
 
 class _EmotionChatPageState extends State<EmotionChatPage> {
   final GPTService _gptService = GPTService();
+  final FirebaseService _firebaseService = FirebaseService();
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  String? currentUserEmail = AuthenticationService.currentUserEmail;
 
-  // 初始化聊天记录，包含初始问题
   final List<Map<String, String>> _chatHistory = [
     {
       'role': 'system',
@@ -23,33 +26,29 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
     },
   ];
 
-  // 控制输入框和按钮的显示状态
   bool _isInputVisible = true;
   bool _isSummaryShown = false;
+  String? _chatSummary;
 
   void _sendMessage() async {
     final userInput = _controller.text;
     if (userInput.isEmpty) return;
 
-    // 添加用户输入到聊天历史
     setState(() {
       _chatHistory.add({'role': 'user', 'content': userInput});
-      _controller.clear(); // 清空输入框内容
-      _isInputVisible = false; // 隐藏输入框
+      _controller.clear();
+      _isInputVisible = false;
     });
 
-    // 滚动到底部以查看最新消息
     _scrollToBottom();
 
     try {
       final reply = await _gptService.getEmotionResponse(_chatHistory);
 
       setState(() {
-        _chatHistory
-            .add({'role': 'assistant', 'content': reply}); // 添加 GPT 回复到聊天历史
+        _chatHistory.add({'role': 'assistant', 'content': reply});
       });
 
-      // 滚动到底部
       _scrollToBottom();
     } catch (error) {
       setState(() {
@@ -73,25 +72,21 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
 
   void _continueConversation() {
     setState(() {
-      _isInputVisible = true; // 显示输入框
+      _isInputVisible = true;
     });
   }
 
   void _endAndSummarizeConversation() async {
     try {
-      // 请求 GPT 总结聊天内容
       final summary = await _gptService.summarizeChat(_chatHistory);
 
       setState(() {
-        _chatHistory.add({
-          'role': 'assistant',
-          'content': '$summary',
-        });
-        _isSummaryShown = true; // 显示总结状态
-        _isInputVisible = false; // 隐藏输入框
+        _chatSummary = summary;
+        _chatHistory.add({'role': 'assistant', 'content': summary});
+        _isSummaryShown = true;
+        _isInputVisible = false;
       });
 
-      // 滚动到底部以查看总结
       _scrollToBottom();
     } catch (error) {
       setState(() {
@@ -103,21 +98,39 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
     }
   }
 
-  void _restartConversation() {
+  void _restartConversation() async {
+    if (_chatSummary != null) {
+      try {
+        // 使用全局变量的用户邮箱
+        await _firebaseService.saveChatSummary(
+            currentUserEmail!, _chatSummary!);
+      } catch (error) {
+        setState(() {
+          _chatHistory.add({
+            'role': 'assistant',
+            'content': 'Error saving summary: $error',
+          });
+        });
+        return;
+      }
+    }
+
     setState(() {
       _chatHistory.clear();
       _chatHistory.addAll([
         {
           'role': 'system',
-          'content': 'You are a helpful assistant specialized in managing emotions.'
+          'content':
+              'You are a helpful assistant specialized in managing emotions.'
         },
         {
           'role': 'assistant',
           'content': 'Hello! How are you feeling now?',
         },
       ]);
-      _isInputVisible = true; // 显示输入框
-      _isSummaryShown = false; // 重置总结状态
+      _isInputVisible = true;
+      _isSummaryShown = false;
+      _chatSummary = null;
     });
   }
 
@@ -142,7 +155,7 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
                 itemBuilder: (context, index) {
                   final message = _chatHistory[index];
                   if (message['role'] == 'system') {
-                    return const SizedBox.shrink(); // 不渲染 system 消息
+                    return const SizedBox.shrink();
                   }
                   final isUser = message['role'] == 'user';
                   return Align(
