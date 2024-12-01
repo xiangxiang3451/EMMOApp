@@ -25,6 +25,7 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
 
   // 控制输入框和按钮的显示状态
   bool _isInputVisible = true;
+  bool _isSummaryShown = false;
 
   void _sendMessage() async {
     final userInput = _controller.text;
@@ -86,6 +87,8 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
           'role': 'assistant',
           'content': '$summary',
         });
+        _isSummaryShown = true; // 显示总结状态
+        _isInputVisible = false; // 隐藏输入框
       });
 
       // 滚动到底部以查看总结
@@ -98,6 +101,24 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
         });
       });
     }
+  }
+
+  void _restartConversation() {
+    setState(() {
+      _chatHistory.clear();
+      _chatHistory.addAll([
+        {
+          'role': 'system',
+          'content': 'You are a helpful assistant specialized in managing emotions.'
+        },
+        {
+          'role': 'assistant',
+          'content': 'Hello! How are you feeling now?',
+        },
+      ]);
+      _isInputVisible = true; // 显示输入框
+      _isSummaryShown = false; // 重置总结状态
+    });
   }
 
   @override
@@ -146,7 +167,14 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
               ),
             ),
             const SizedBox(height: 10),
-            if (_isInputVisible)
+            if (_isSummaryShown)
+              Center(
+                child: ElevatedButton(
+                  onPressed: _restartConversation,
+                  child: const Text('Restart Conversation'),
+                ),
+              )
+            else if (_isInputVisible)
               Row(
                 children: [
                   Expanded(
