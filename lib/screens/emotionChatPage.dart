@@ -11,11 +11,15 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // 聊天记录，初始化 system 提示
+  // 初始化聊天记录，包含初始问题
   final List<Map<String, String>> _chatHistory = [
     {
       'role': 'system',
       'content': 'You are a helpful assistant specialized in managing emotions.'
+    },
+    {
+      'role': 'assistant',
+      'content': 'Hello!How are you feeling now?',
     },
   ];
 
@@ -36,7 +40,8 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
       final reply = await _gptService.getEmotionResponse(_chatHistory);
 
       setState(() {
-        _chatHistory.add({'role': 'assistant', 'content': reply}); // 添加 GPT 回复到聊天历史
+        _chatHistory
+            .add({'role': 'assistant', 'content': reply}); // 添加 GPT 回复到聊天历史
       });
 
       // 滚动到底部
@@ -81,11 +86,16 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
                 itemCount: _chatHistory.length,
                 itemBuilder: (context, index) {
                   final message = _chatHistory[index];
+                  if (message['role'] == 'system') {
+                    return const SizedBox.shrink(); // 不渲染 system 消息
+                  }
                   final isUser = message['role'] == 'user';
                   return Align(
-                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment:
+                        isUser ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 10),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: isUser ? Colors.blue : Colors.grey[300],
@@ -93,7 +103,8 @@ class _EmotionChatPageState extends State<EmotionChatPage> {
                       ),
                       child: Text(
                         message['content']!,
-                        style: TextStyle(color: isUser ? Colors.white : Colors.black),
+                        style: TextStyle(
+                            color: isUser ? Colors.white : Colors.black),
                       ),
                     ),
                   );
