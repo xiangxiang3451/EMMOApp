@@ -3,7 +3,7 @@ import 'package:emmo/utils/constants.dart';
 import 'package:http/http.dart' as http;
 
 class GPTService {
-  final String _apiKey = '$gptKey';
+  final String _apiKey = gptKey;
 
   Future<String> getEmotionResponse(List<Map<String, String>> chatHistory) async {
     const apiUrl = 'https://sg.uiuiapi.com/v1/chat/completions';

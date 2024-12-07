@@ -133,7 +133,7 @@ class _MoodScreenState extends State<MoodScreen> {
                 alignment: Alignment.center,
                 children: List.generate(emotions.length, (index) {
                   final double angle = 2 * pi * index / emotions.length;
-                  final double radius = 102;
+                  const double radius = 102;
                   final double x = radius * cos(angle);
                   final double y = radius * sin(angle);
                   return Positioned(
@@ -410,7 +410,7 @@ class _NextPageState extends State<NextPage> {
           TextButton(
             onPressed: _onSaveButtonPressed,
             child: const Text(
-              '完成',
+              'Finish',
               style: TextStyle(
                   color: Colors.green,
                   fontSize: 18,
@@ -431,7 +431,7 @@ class _NextPageState extends State<NextPage> {
                   Icon(Icons.mode, size: 50, color: Colors.grey),
                   SizedBox(height: 8),
                   Text(
-                    '记录你的心情',
+                    'Record your mood!',
                     style: TextStyle(
                         fontSize: 16,
                         color: Colors.white,
@@ -617,7 +617,7 @@ class _NextPageState extends State<NextPage> {
 
 // 地图选择页面
 class LocationPickerScreen extends StatefulWidget {
-  const LocationPickerScreen({Key? key}) : super(key: key);
+  const LocationPickerScreen({super.key});
 
   @override
   State<LocationPickerScreen> createState() => _LocationPickerScreenState();

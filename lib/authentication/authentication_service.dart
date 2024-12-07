@@ -38,13 +38,13 @@ class AuthenticationService {
     try {
       final smtpServer = _getGmailSmtpServer();
       final message = Message()
-        ..from = Address('$mail') 
+        ..from = const Address(mail) 
         ..recipients.add(email)
         ..subject = 'Your Verification Code'
         ..text = 'Your verification code is: $verificationCode';
 
       final sendReport = await send(message, smtpServer);
-      print('Email sent: ' + sendReport.toString());
+      print('Email sent: $sendReport');
       return true;
     } catch (e) {
       print('Error sending email: $e');
@@ -57,8 +57,8 @@ class AuthenticationService {
     return SmtpServer(
       'smtp.gmail.com',
       port: 587,
-      username: '$mail',  
-      password: '$mailPassword',   
+      username: mail,  
+      password: mailPassword,   
       ssl: false,   
       // startTls: true,  
     );

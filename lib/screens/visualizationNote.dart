@@ -122,14 +122,14 @@ class _VisualizationnoteState extends State<Visualizationnote> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '地址: $address',
+                                    'address: $address',
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: const TextStyle(fontSize: 14),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '备注: $thoughts',
+                                    'note: $thoughts',
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: const TextStyle(fontSize: 14),

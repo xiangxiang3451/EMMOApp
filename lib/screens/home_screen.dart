@@ -2,7 +2,7 @@ import 'package:emmo/screens/calendar_screen.dart';
 import 'package:emmo/screens/emotionChatPage.dart';
 import 'package:emmo/screens/mood_screen.dart';
 import 'package:emmo/screens/setting_screen.dart';
-import 'package:emmo/screens/statistics_screen.dart';
+import 'package:emmo/screens/driftBottlePage.dart';
 import 'package:emmo/screens/visualizationNote.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const CalendarScreen(),
     EmotionChatPage(), 
     const Visualizationnote(), 
-    const StatisticsScreen(), 
+    DriftBottlePage(), 
     const SettingScreen()
   ];
 

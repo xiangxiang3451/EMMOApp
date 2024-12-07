@@ -4,6 +4,8 @@ import 'package:emmo/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 
 class EmotionChatPage extends StatefulWidget {
+  const EmotionChatPage({super.key});
+
   @override
   _EmotionChatPageState createState() => _EmotionChatPageState();
 }
