@@ -184,10 +184,18 @@ class FirebaseService {
 
   Future<Map<String, dynamic>?> pickBottle() async {
   try {
-    // 获取所有状态为 open 的漂流瓶
+    // 获取当前用户的 UID
+    String? currentUserEmail = AuthenticationService.currentUserEmail;
+    if (currentUserEmail == null) {
+      print("用户未登录");
+      return null;
+    }
+
+    // 获取所有状态为 open 且不是当前用户投放的漂流瓶
     final querySnapshot = await FirebaseFirestore.instance
         .collection('bottles')
         .where("status", isEqualTo: "open")
+        .where("author_id", isNotEqualTo: currentUserEmail) // 过滤掉当前用户自己的漂流瓶
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
@@ -200,7 +208,7 @@ class FirebaseService {
         "author_id": randomDoc["author_id"],
       };
     } else {
-      print("没有更多的漂流瓶！");
+      print("没有更多的漂流瓶可拾取！");
       return null;
     }
   } catch (e) {
