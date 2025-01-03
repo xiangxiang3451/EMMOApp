@@ -276,6 +276,15 @@ Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
     };
   }).toList();
 }
+ // 获取所有有记录的日期
+  Future<List<DateTime>> getRecordedDates() async {
+    QuerySnapshot snapshot = await _firestore.collection('record').get();
 
+    // 将记录的日期字段提取出来并转换为 DateTime
+    return snapshot.docs.map((doc) {
+      String dateStr = doc['date']; // 假设数据库中日期字段是 'date'
+      return DateTime.parse(dateStr.split(' ')[0]); // 忽略时间，仅保留年月日
+    }).toList();
+  }
 
 }

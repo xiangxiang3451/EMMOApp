@@ -22,11 +22,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
   final FirebaseService _firebaseService = FirebaseService();
   late DateTime _currentDate;
   final ScrollController _scrollController = ScrollController();
+  late Future<Set<DateTime>> _recordedDates;
 
   @override
   void initState() {
     super.initState();
     _currentDate = DateTime.now();
+    _recordedDates = _fetchRecordedDates();
+  }
+
+  Future<Set<DateTime>> _fetchRecordedDates() async {
+    // 获取所有情绪记录的日期
+    List<DateTime> recordedDates = await _firebaseService.getRecordedDates();
+    // 返回仅包含年月日部分的日期集合
+    return recordedDates.map((date) => DateTime(date.year, date.month, date.day)).toSet();
   }
 
   void _viewDayDetails(BuildContext context, DateTime date) {
@@ -49,90 +58,107 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF40514E),
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                DateTime monthDate = DateTime(_currentDate.year, _currentDate.month - index);
-                List<DateTime> daysInMonth = _getDaysInMonth(monthDate.year, monthDate.month);
-                int firstWeekday = _getFirstWeekdayOfMonth(monthDate.year, monthDate.month);
+      body: FutureBuilder<Set<DateTime>>(
+        future: _recordedDates,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Text(
-                          "${monthDate.month}.${monthDate.year}",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          final recordedDates = snapshot.data ?? {};
+
+          return CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    DateTime monthDate = DateTime(_currentDate.year, _currentDate.month - index);
+                    List<DateTime> daysInMonth = _getDaysInMonth(monthDate.year, monthDate.month);
+                    int firstWeekday = _getFirstWeekdayOfMonth(monthDate.year, monthDate.month);
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Text(
+                              "${monthDate.month}.${monthDate.year}",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      Container(
-                        height: 330,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF40514E),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7,
-                            childAspectRatio: 1.0,
-                          ),
-                          itemCount: 42,
-                          itemBuilder: (context, gridIndex) {
-                            int dayIndex = gridIndex - firstWeekday + 1;
-                            if (dayIndex <= 0 || dayIndex > daysInMonth.length) {
-                              return const SizedBox.shrink();
-                            }
+                          Container(
+                            height: 330,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF40514E),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 7,
+                                childAspectRatio: 1.0,
+                              ),
+                              itemCount: 42,
+                              itemBuilder: (context, gridIndex) {
+                                int dayIndex = gridIndex - firstWeekday + 1;
+                                if (dayIndex <= 0 || dayIndex > daysInMonth.length) {
+                                  return const SizedBox.shrink();
+                                }
 
-                            DateTime day = daysInMonth[dayIndex - 1];
+                                DateTime day = daysInMonth[dayIndex - 1];
+                                bool hasRecord = recordedDates.contains(day);
 
-                            return GestureDetector(
-                              onTap: () {
-                                _viewDayDetails(context, day);
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.all(4.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  border: Border.all(color: Colors.transparent),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '$dayIndex',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                return GestureDetector(
+                                  onTap: () {
+                                    _viewDayDetails(context, day);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.all(4.0),
+                                    decoration: BoxDecoration(
+                                      color: hasRecord ? Colors.orange : Colors.green,
+                                      border: Border.all(color: Colors.transparent),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '$dayIndex',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              },
-              childCount: 12,
-            ),
-          ),
-        ],
+                    );
+                  },
+                  childCount: 12,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
+
 
 class DayDetailsScreen extends StatelessWidget {
   final DateTime date;
