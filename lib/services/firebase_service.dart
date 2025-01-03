@@ -247,4 +247,35 @@ Future<void> respondToBottle(String bottleId, String responseContent) async {
   }
 }
 
+ // 获取指定日期的心情记录（忽略时间）
+Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
+  String formattedDate = "${date.year}-${date.month}-${date.day}";
+  String? userId = AuthenticationService.currentUserEmail;
+
+  if (userId == null) {
+    throw Exception("用户未登录！");
+  }
+
+  QuerySnapshot snapshot = await _firestore
+      .collection('record')
+      .where('userId', isEqualTo: userId) // 添加用户筛选
+      .get();
+
+  // 筛选出日期相同的记录，忽略时间部分
+  return snapshot.docs.where((doc) {
+    final docDate = DateTime.parse(doc['date']);
+    return docDate.year == date.year && docDate.month == date.month && docDate.day == date.day;
+  }).map((doc) {
+    return {
+      'expression': doc['expression'],
+      'color': doc['color'],
+      'date': doc['date'],
+      'address': doc['address'],
+      'thoughts': doc['thoughts'],
+      'photo': doc['photo'],
+    };
+  }).toList();
+}
+
+
 }
