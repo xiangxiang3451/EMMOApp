@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:emmo/services/firebase_service.dart';
 
 class DriftBottlePage extends StatefulWidget {
+  const DriftBottlePage({super.key});
+
   @override
   _DriftBottlePageState createState() => _DriftBottlePageState();
 }
@@ -142,7 +144,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                   controller: _bottleController,
                   maxLines: 3,
                   decoration: const InputDecoration(
-                    hintText: "写下你的感受...",
+                    hintText: "Write your feelings...",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -151,7 +153,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                   onPressed: _isLoadingThrow ? null : _submitBottle,
                   child: _isLoadingThrow
                       ? const CircularProgressIndicator()
-                      : const Text("扔漂流瓶"),
+                      : const Text("Throw bottle"),
                 ),
               ],
             ),
@@ -215,7 +217,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                         controller: _responseController,
                         maxLines: 3,
                         decoration: const InputDecoration(
-                          hintText: "写下你的鼓励话语...",
+                          hintText: "Write down your words of encouragement...",
                           border: InputBorder.none,  // 移除内部边框
                           contentPadding: EdgeInsets.all(10),
                         ),
@@ -226,7 +228,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                       onPressed: _isLoadingResponse ? null : _respondToBottle,
                       child: _isLoadingResponse
                           ? const CircularProgressIndicator()
-                          : const Text("发送回应"),
+                          : const Text("Send"),
                     ),
                   ],
                 ),
@@ -272,7 +274,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                       textStyle: const TextStyle(fontSize: 18),
                       backgroundColor: Colors.blue.withOpacity(0.7), // 半透明背景
                     ),
-                    child: const Text("扔漂流瓶",style: TextStyle(color: Colors.white),),
+                    child: const Text("Throw bottle",style: TextStyle(color: Colors.white),),
                   ),
                   const SizedBox(width: 10),
                   ElevatedButton(
@@ -282,7 +284,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                       textStyle: const TextStyle(fontSize: 18),
                       backgroundColor: Colors.blue.withOpacity(0.7), // 半透明背景
                     ),
-                    child: const Text("拾取漂流瓶",style: TextStyle(color: Colors.white),),
+                    child: const Text("Pick up",style: TextStyle(color: Colors.white),),
                   ),
                 ],
               ),),

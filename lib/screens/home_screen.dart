@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // 页面选项列表
   static final List<Widget> _widgetOptions = <Widget>[
     const CalendarScreen(),
-    EmotionChatPage(),
+    const EmotionChatPage(),
     const Visualizationnote(),
     DriftBottlePage(),
     const SettingScreen(),
@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
         type: BottomNavigationBarType.fixed, // 固定模式，确保未选中的图标保持原样
         iconSize: 20,
       ),
-      drawer: Container(
+      drawer: SizedBox(
         width: MediaQuery.of(context).size.width / 2,
         child: Drawer(
           backgroundColor: const Color(0xFF62D2A2),

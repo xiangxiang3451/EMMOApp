@@ -178,7 +178,7 @@ class FirebaseService {
       print("漂流瓶已投出！");
     } catch (e) {
       print("创建漂流瓶失败：$e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -243,7 +243,7 @@ Future<void> respondToBottle(String bottleId, String responseContent) async {
     print("回应已发送！");
   } catch (e) {
     print("回应失败：$e");
-    throw e;
+    rethrow;
   }
 }
 
