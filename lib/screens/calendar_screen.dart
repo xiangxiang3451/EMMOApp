@@ -146,7 +146,6 @@ class DayDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("${date.year}-${date.month}-${date.day}"),
-         automaticallyImplyLeading: false,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: firebaseService.getRecordsForDate(date),
