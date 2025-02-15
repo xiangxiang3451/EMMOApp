@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:emmo/screens/calendar_screen.dart';
 import 'package:emmo/screens/emotionChatPage.dart';
 import 'package:emmo/screens/mood_screen.dart';
-import 'package:emmo/screens/setting_screen.dart';
+import 'package:emmo/screens/myGame_screen.dart';
 import 'package:emmo/screens/driftBottlePage.dart';
 import 'package:emmo/screens/visualizationNote.dart';
 
@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const EmotionChatPage(),
     const Visualizationnote(),
     DriftBottlePage(),
-    const SettingScreen(),
+    MyGame(),
   ];
 
   // 页面切换方法
@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SettingScreen()),
+                        builder: (context) => MyGame()),
                   );
                 },
               ),
