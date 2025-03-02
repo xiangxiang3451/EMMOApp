@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           // 添加设置按钮到右侧
           IconButton(
-            icon: const Icon(Icons.settings), // 设置按钮的图标
+            icon: const Icon(Icons.table_rows), // 设置按钮的图标
             onPressed: () {
               // 使用 _scaffoldKey 打开侧边栏
               _scaffoldKey.currentState?.openDrawer();
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_view_day),
+            icon: Icon(Icons.museum),
             label: 'Home',
           ),
           BottomNavigationBarItem(
@@ -92,16 +92,16 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Talk',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.museum),
-            label: 'Notes',
+            icon: Icon(Icons.games),
+            label: 'Games',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.poll),
-            label: "Search",
+            icon: Icon(Icons.mail),
+            label: "Letter",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            label: "Settings",
+            label: "Games",
           ),
         ],
         currentIndex: _selectedIndex,
