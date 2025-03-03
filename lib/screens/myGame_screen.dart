@@ -141,8 +141,10 @@ class FullScreenGamePage extends StatelessWidget {
         children: [
           WebViewWidget(controller: controller),
           Positioned(
-            top: 15,
-            right: 15,
+            width: 25,
+            height: 25,
+            left: 15,
+            top: 20,
             child: FloatingActionButton(
               onPressed: onClose,
               backgroundColor: Colors.red,
