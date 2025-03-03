@@ -1,5 +1,9 @@
+import 'package:emmo/screens/driftBottlePage.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final List<OverlayEntry> _overlayEntries = [];
 
 class MyGame extends StatelessWidget {
   @override
@@ -8,78 +12,144 @@ class MyGame extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: WebViewExample(),
+      navigatorKey: navigatorKey,
+      home: GameHomePage(),
     );
   }
 }
 
-class WebViewExample extends StatefulWidget {
+class GameHomePage extends StatefulWidget {
   @override
-  _WebViewExampleState createState() => _WebViewExampleState();
+  _GameHomePageState createState() => _GameHomePageState();
 }
 
-class _WebViewExampleState extends State<WebViewExample> {
-  late final WebViewController controller;
+class _GameHomePageState extends State<GameHomePage> {
+  final List<Map<String, dynamic>> games = [
+    {
+      'name': 'Destress',
+      'url':
+          'https://www.hoodamath.com/mobile/games/destress-game/game.html?nocheckorient=1',
+      'icon': Icons.videogame_asset,
+    },
+    {
+      'name': 'Piano Tiles',
+      'url': 'https://www.hoodamath.com/mobile/games/piano-tiles/game.html?nocheckorient=1',
+      'icon': Icons.videogame_asset,
+    },
+    {
+      'name': 'Cubeform',
+      'url': 'https://www.hoodamath.com/mobile/games/cubeform/game.html?nocheckorient=1',
+      'icon': Icons.videogame_asset,
+    },
+  
+  ];
 
-  @override
-  void initState() {
-    super.initState();
+  void _showGameFullScreen(String url) {
+    OverlayEntry? overlayEntry;
 
-    // 初始化 WebViewController
-    controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted) // 启用 JavaScript
-      ..setBackgroundColor(const Color(0x00000000)) // 设置背景透明
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (String url) {
-            // 在页面加载完成后注入 JavaScript 代码
-            controller.runJavaScript(
-              """
-              // 设置视口
-              var meta = document.createElement('meta');
-              meta.name = 'viewport';
-              meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-              document.getElementsByTagName('head')[0].appendChild(meta);
+    overlayEntry = OverlayEntry(
+      builder: (context) => FullScreenGamePage(
+        gameUrl: url,
+        onClose: () {
+          if (overlayEntry != null && _overlayEntries.contains(overlayEntry)) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              overlayEntry?.remove();
+              _overlayEntries.remove(overlayEntry);
+            });
+          }
+        },
+      ),
+    );
 
-              // 获取游戏容器的元素
-              var gameContainer = document.getElementById('game-container');
-              if (gameContainer) {
-                // 设置游戏容器的宽高为屏幕宽高
-                gameContainer.style.width = '100%';
-                gameContainer.style.height = '100%';
-                gameContainer.style.position = 'absolute';
-                gameContainer.style.top = '0';
-                gameContainer.style.left = '0';
-              }
-
-              // 获取游戏画布的元素
-              var gameCanvas = document.querySelector('canvas');
-              if (gameCanvas) {
-                // 设置画布的宽高为屏幕宽高
-                gameCanvas.style.width = '100%';
-                gameCanvas.style.height = '100%';
-                gameCanvas.style.position = 'absolute';
-                gameCanvas.style.top = '0';
-                gameCanvas.style.left = '0';
-              }
-              """,
-            );
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(
-          'https://www.hoodamath.com/mobile/games/destress-game/game.html?nocheckorient=1')); // 加载 H5 游戏
+    _overlayEntries.add(overlayEntry);
+    Overlay.of(navigatorKey.currentContext!)?.insert(overlayEntry);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: WebViewWidget(
-          controller: controller,
+      appBar: AppBar(title: const Text('Games')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 游戏列表
+            Row(
+              children: games.map((game) {
+                return GestureDetector(
+                  onTap: () => _showGameFullScreen(game['url']),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 16),
+                    child: Column(
+                      children: [
+                        Icon(game['icon'], size: 50, color: Colors.blue),
+                        const SizedBox(height: 5),
+                        Text(game['name']),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
+            // 游戏下面的下划线
+            const SizedBox(height: 20),
+            // 邮箱子标题
+            const Text(
+              '邮箱',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 5),
+            // 邮箱下划线
+            const Divider(thickness: 1, color: Colors.grey),
+            const SizedBox(height: 20),
+            // 邮箱图标并点击进入邮箱界面
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>const DriftBottlePage (), // 替换成你想跳转的页面
+                  ),
+                );
+              },
+              child: const Icon(Icons.email, size: 50, color: Colors.blue),
+            )
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class FullScreenGamePage extends StatelessWidget {
+  final String gameUrl;
+  final VoidCallback onClose;
+
+  FullScreenGamePage({required this.gameUrl, required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(gameUrl));
+
+    return Material(
+      color: Colors.black.withOpacity(0.8),
+      child: Stack(
+        children: [
+          WebViewWidget(controller: controller),
+          Positioned(
+            top: 15,
+            right: 15,
+            child: FloatingActionButton(
+              onPressed: onClose,
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.close, color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }

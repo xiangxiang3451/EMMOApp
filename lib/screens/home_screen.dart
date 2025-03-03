@@ -4,7 +4,6 @@ import 'package:emmo/screens/emotionChatPage.dart';
 import 'package:emmo/screens/mood_screen.dart';
 import 'package:emmo/screens/myGame_screen.dart';
 import 'package:emmo/screens/driftBottlePage.dart';
-import 'package:emmo/screens/visualizationNote.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static final List<Widget> _widgetOptions = <Widget>[
     const CalendarScreen(),
     const EmotionChatPage(),
-    const Visualizationnote(),
+    MyGame(),
     DriftBottlePage(),
     MyGame(),
   ];
