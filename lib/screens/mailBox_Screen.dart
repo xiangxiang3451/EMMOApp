@@ -441,22 +441,16 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
             ),
             // 查看回复按钮，放置在底部中间
             Positioned(
-              bottom: 50,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: _showReceivedResponsesDialog,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 32),
-                    textStyle: const TextStyle(fontSize: 18),
-                    backgroundColor: Colors.orange.withOpacity(0.7), // 半透明背景
-                  ),
-                  child: const Text(
-                    "View Replies",
-                    style: TextStyle(color: Colors.white),
-                  ),
+              bottom: 30, // 调整底部距离，保持美观
+              right: 30, // 让按钮靠右对齐
+              child: FloatingActionButton(
+                onPressed: _showReceivedResponsesDialog,
+                backgroundColor: Colors.orange.withOpacity(0.7), // 半透明背景
+                tooltip: 'View Replies',
+                child: const Icon(
+                  Icons.mark_email_read, // 信封带勾的图标，表示查看回复
+                  color: Colors.white,
+                  size: 30,
                 ),
               ),
             ),

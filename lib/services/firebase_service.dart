@@ -324,7 +324,6 @@ String _formatDate(String isoDate) {
 
  // 获取指定日期的心情记录（忽略时间）
 Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
-  String formattedDate = "${date.year}-${date.month}-${date.day}";
   String? userId = AuthenticationService.currentUserEmail;
 
   if (userId == null) {
