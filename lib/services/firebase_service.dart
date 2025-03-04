@@ -350,15 +350,26 @@ Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
     };
   }).toList();
 }
- // 获取所有有记录的日期
-  Future<List<DateTime>> getRecordedDates() async {
-    QuerySnapshot snapshot = await _firestore.collection('record').get();
+ // 获取所有有记录的日期（仅限当前用户）
+Future<List<DateTime>> getRecordedDates() async {
+  String? userId = AuthenticationService.currentUserEmail;
 
-    // 将记录的日期字段提取出来并转换为 DateTime
-    return snapshot.docs.map((doc) {
-      String dateStr = doc['date']; // 假设数据库中日期字段是 'date'
-      return DateTime.parse(dateStr.split(' ')[0]); // 忽略时间，仅保留年月日
-    }).toList();
+  if (userId == null) {
+    throw Exception("用户未登录！");
   }
+
+  // 获取当前用户的所有记录
+  QuerySnapshot snapshot = await _firestore
+      .collection('record')
+      .where('userId', isEqualTo: userId) // 只获取当前登录用户的记录
+      .get();
+
+  // 将记录的日期字段提取出来并转换为 DateTime
+  return snapshot.docs.map((doc) {
+    String dateStr = doc['date']; // 假设数据库中日期字段是 'date'
+    return DateTime.parse(dateStr.split(' ')[0]); // 忽略时间，仅保留年月日
+  }).toList();
+}
+
 
 }
