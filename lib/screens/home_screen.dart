@@ -3,7 +3,7 @@ import 'package:emmo/screens/calendar_screen.dart';
 import 'package:emmo/screens/emotionChatPage.dart';
 import 'package:emmo/screens/mood_screen.dart';
 import 'package:emmo/screens/myGame_screen.dart';
-import 'package:emmo/screens/driftBottlePage.dart';
+import 'package:emmo/screens/mailBox_Screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -124,6 +124,94 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
     }
   }
 
+  /// 展示收到的回信内容
+  void _showReceivedResponsesDialog() async {
+    try {
+      final receivedData = await _firebaseService.getReceivedResponses();
+
+      if (receivedData.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("你还没有收到任何回信！")),
+        );
+        return;
+      }
+
+      showModalBottomSheet(
+        // ignore: use_build_context_synchronously
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            color: const Color.fromRGBO(238, 199, 140, 1),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: receivedData.length,
+              itemBuilder: (context, index) {
+                final bottle = receivedData[index];
+                final responses = bottle['responses'] as List<dynamic>;
+
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 显示用户的信内容
+                        Text(
+                          "Your Letter: ${bottle['bottle_content']}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // 展示对应的所有回复
+                        ...responses.map((response) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Reply: ${response['response_content']}",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Date: ${response['created_at']}",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  const Divider(),
+                                ],
+                              ),
+                            )),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("获取回信失败：$e")),
+      );
+    }
+  }
+
   /// 显示扔漂流瓶窗口
   void _showThrowBottleDialog() {
     showModalBottomSheet(
@@ -309,7 +397,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                 ),
               ),
             ),
-            // 按钮层，悬浮在图片上
+            // 顶部按钮层，悬浮在图片上
             Positioned(
               top: 30,
               left: 0,
@@ -348,6 +436,27 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+            // 查看回复按钮，放置在底部中间
+            Positioned(
+              bottom: 50,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: _showReceivedResponsesDialog,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32),
+                    textStyle: const TextStyle(fontSize: 18),
+                    backgroundColor: Colors.orange.withOpacity(0.7), // 半透明背景
+                  ),
+                  child: const Text(
+                    "View Replies",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emmo/authentication/authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -246,6 +247,80 @@ Future<void> respondToBottle(String bottleId, String responseContent) async {
     rethrow;
   }
 }
+
+// 获取当前用户收到的回信
+Future<List<Map<String, dynamic>>> getReceivedResponses() async {
+  String? currentUserEmail = AuthenticationService.currentUserEmail;
+
+  if (currentUserEmail == null) {
+    throw Exception("用户未登录");
+  }
+
+  try {
+    // 获取用户的所有漂流瓶（包括瓶子内容）
+    final bottlesSnapshot = await FirebaseFirestore.instance
+        .collection('bottles')
+        .where('author_id', isEqualTo: currentUserEmail)
+        .get();
+
+    if (bottlesSnapshot.docs.isEmpty) {
+      print("没有找到用户的漂流瓶");
+      return [];
+    }
+
+    // 获取所有的瓶子ID
+    final bottleIds = bottlesSnapshot.docs.map((doc) => doc.id).toList();
+
+    // 获取所有回复
+    final responsesSnapshot = await FirebaseFirestore.instance
+        .collection('responses')
+        .where('bottle_id', whereIn: bottleIds)
+        .get();
+
+    // 将瓶子和回复关联，格式化数据（仅保留有回复的信件）
+    List<Map<String, dynamic>> result = [];
+    for (var bottle in bottlesSnapshot.docs) {
+      final bottleData = bottle.data();
+      final bottleId = bottle.id;
+
+      // 仅获取有对应回复的漂流瓶
+      final relatedResponses = responsesSnapshot.docs
+          .where((response) => response['bottle_id'] == bottleId)
+          .map((doc) => {
+                "id": doc.id,
+                "response_content": doc['response_content'],
+                "created_at": _formatDate(doc['created_at']),
+              })
+          .toList();
+
+      // 仅当有回复时才添加到结果中
+      if (relatedResponses.isNotEmpty) {
+        result.add({
+          "bottle_content": bottleData['content'], // 用户的信内容
+          "responses": relatedResponses, // 对应的所有回复
+        });
+      }
+    }
+
+    return result;
+  } catch (e) {
+    print("获取回信内容失败：$e");
+    return [];
+  }
+}
+
+// 日期格式化函数，处理 ISO 8601 字符串
+String _formatDate(String isoDate) {
+  try {
+    DateTime dateTime = DateTime.parse(isoDate);
+    return DateFormat('yyyy年MM月dd日 HH:mm').format(dateTime);
+  } catch (e) {
+    print("日期格式化失败：$e");
+    return "未知时间";
+  }
+}
+
+
 
  // 获取指定日期的心情记录（忽略时间）
 Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
