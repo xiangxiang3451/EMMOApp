@@ -1,3 +1,4 @@
+import 'package:emmo/screens/soundScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:emmo/screens/calendar_screen.dart';
 import 'package:emmo/screens/emotionChatPage.dart';
@@ -23,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const CalendarScreen(),
     const EmotionChatPage(),
     MyGame(),
-    DriftBottlePage(),
+    SoundScreen(),
     MyGame(),
   ];
 

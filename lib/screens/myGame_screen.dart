@@ -6,6 +6,8 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final List<OverlayEntry> _overlayEntries = [];
 
 class MyGame extends StatelessWidget {
+  const MyGame({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,6 +21,8 @@ class MyGame extends StatelessWidget {
 }
 
 class GameHomePage extends StatefulWidget {
+  const GameHomePage({super.key});
+
   @override
   _GameHomePageState createState() => _GameHomePageState();
 }
@@ -69,7 +73,7 @@ class _GameHomePageState extends State<GameHomePage> {
     );
 
     _overlayEntries.add(overlayEntry);
-    Overlay.of(navigatorKey.currentContext!)?.insert(overlayEntry);
+    Overlay.of(navigatorKey.currentContext!).insert(overlayEntry);
   }
 
   @override
@@ -232,7 +236,7 @@ class FullScreenGamePage extends StatelessWidget {
   final String gameUrl;
   final VoidCallback onClose;
 
-  FullScreenGamePage({required this.gameUrl, required this.onClose});
+  const FullScreenGamePage({super.key, required this.gameUrl, required this.onClose});
 
   @override
   Widget build(BuildContext context) {

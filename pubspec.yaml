@@ -26,6 +26,7 @@ dependencies:
   http: ^1.2.2
   webview_flutter: ^4.8.0
   intl: ^0.18.1
+  audioplayers: ^6.3.0
 
 
 dev_dependencies:
@@ -40,5 +41,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/mail.jpg
+    - assets/sound1.mp3
+    - assets/sound2.mp3
+    - assets/sound3.mp3
+    - assets/sound4.mp3
+    - assets/sound5.mp3
 
   
