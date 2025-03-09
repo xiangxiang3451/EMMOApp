@@ -62,6 +62,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (isVerified) {
       // After successful verification, navigate to the main screen
       AuthenticationService.currentUserEmail=email;  // 获取当前登录用户的 email
+      // 动态生成并保存配对码
+      await AuthenticationService.generateAndSavePairCode(email);
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),

@@ -1,10 +1,10 @@
 import 'package:emmo/screens/soundScreen.dart';
+import 'package:emmo/screens/visualizationNote.dart';
 import 'package:flutter/material.dart';
 import 'package:emmo/screens/calendar_screen.dart';
 import 'package:emmo/screens/emotionChatPage.dart';
 import 'package:emmo/screens/mood_screen.dart';
 import 'package:emmo/screens/myGame_screen.dart';
-import 'package:emmo/screens/mailBox_Screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const EmotionChatPage(),
     MyGame(),
     SoundScreen(),
-    MyGame(),
+    const Visualizationnote(),
   ];
 
   // 页面切换方法
@@ -96,8 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Games',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.mail),
-            label: "Letter",
+            icon: Icon(Icons.access_time),
+            label: "Relax",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
