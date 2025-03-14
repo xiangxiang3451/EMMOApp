@@ -64,6 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
       AuthenticationService.currentUserEmail=email;  // 获取当前登录用户的 email
       // 动态生成并保存配对码
       await AuthenticationService.generateAndSavePairCode(email);
+      // 登录成功后，加载配对信息
+      await AuthenticationService.loadPairInfo();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),

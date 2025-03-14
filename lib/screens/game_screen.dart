@@ -1,4 +1,4 @@
-import 'package:emmo/screens/mailBox_Screen.dart';
+import 'package:emmo/screens/mail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

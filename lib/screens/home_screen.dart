@@ -1,10 +1,11 @@
-import 'package:emmo/screens/soundScreen.dart';
-import 'package:emmo/screens/visualizationNote.dart';
+import 'package:emmo/authentication/authentication_service.dart';
+import 'package:emmo/screens/sound_Screen.dart';
+import 'package:emmo/screens/shared_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:emmo/screens/calendar_screen.dart';
-import 'package:emmo/screens/emotionChatPage.dart';
+import 'package:emmo/screens/chat_screen.dart';
 import 'package:emmo/screens/mood_screen.dart';
-import 'package:emmo/screens/myGame_screen.dart';
+import 'package:emmo/screens/game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+@override
+void initState() {
+  super.initState();
+}
   // 打开MoodScreen页面的方法
   void _openMoodScreen() {
     Navigator.push(

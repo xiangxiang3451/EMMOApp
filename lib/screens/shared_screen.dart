@@ -119,6 +119,18 @@ class _VisualizationnoteState extends State<Visualizationnote> {
               );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.person_remove),
+            onPressed: () async {
+              await AuthenticationService.unpairUsers();
+              setState(() {
+                pairedUserEmail = null;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('已解除配对')),
+              );
+            },
+          ),
         ],
       ),
       body: Container(
@@ -179,7 +191,8 @@ class _VisualizationnoteState extends State<Visualizationnote> {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -284,6 +297,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
     );
   }
 }
+
 class PairingScreen extends StatefulWidget {
   const PairingScreen({super.key});
 
@@ -308,7 +322,8 @@ class _PairingScreenState extends State<PairingScreen> {
     if (currentUserEmail == null) return;
 
     final firestore = FirebaseFirestore.instance;
-    final userDoc = await firestore.collection('users').doc(currentUserEmail).get();
+    final userDoc =
+        await firestore.collection('users').doc(currentUserEmail).get();
 
     if (userDoc.exists) {
       setState(() {
@@ -367,7 +382,8 @@ class _PairingScreenState extends State<PairingScreen> {
             if (_currentPairCode != null) ...[
               Text(
                 '您的配对码：$_currentPairCode',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
             ],

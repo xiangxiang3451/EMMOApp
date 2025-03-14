@@ -10,6 +10,7 @@ class AuthenticationService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static String? currentUserEmail;
+  static String? pairedUserEmail;
 
   // 生成6位随机验证码
   static String _generateVerificationCode() {
@@ -91,17 +92,15 @@ class AuthenticationService {
 
 // 生成并保存配对码（仅在用户注册或首次登录时调用）
   static Future<void> generateAndSavePairCode(String email) async {
-    final firestore = FirebaseFirestore.instance;
-
     // 检查用户是否已经有配对码
-    final userDoc = await firestore.collection('users').doc(email).get();
+    final userDoc = await _firestore.collection('users').doc(email).get();
 
     // 如果用户没有配对码，则生成并保存
     if (!userDoc.exists || userDoc.data()?['pairCode'] == null) {
       final pairCode = _generatePairCode(); // 生成新的配对码
 
       // 将配对码保存到 users 集合
-      await firestore.collection('users').doc(email).set({
+      await _firestore.collection('users').doc(email).set({
         'pairCode': pairCode,
       }, SetOptions(merge: true)); // 使用 merge 避免覆盖其他字段
     }
@@ -116,7 +115,22 @@ class AuthenticationService {
     // 登录成功后，动态生成并保存配对码
     await generateAndSavePairCode(email);
 
+    // 登录成功后，加载配对信息
+    await loadPairInfo();
+
     return true; // 登录成功
+  }
+
+  // 加载配对信息
+  static Future<void> loadPairInfo() async {
+    final currentUserEmail = AuthenticationService.currentUserEmail;
+    if (currentUserEmail == null) return;
+
+    final pairDoc = await _firestore.collection('pairs').doc(currentUserEmail).get();
+
+    if (pairDoc.exists) {
+      pairedUserEmail = pairDoc['pairedUserEmail'];
+    }
   }
 
   // 通过配对码配对用户
@@ -145,20 +159,41 @@ class AuthenticationService {
       'pairedUserEmail': currentUserEmail,
     });
 
+    // 更新本地状态
+    AuthenticationService.pairedUserEmail = pairedUserEmail;
+
     return true;
   }
 
   // 获取配对用户
   static Future<String?> getPairedUserEmail() async {
+    if (pairedUserEmail != null) return pairedUserEmail;
+
     final currentUserEmail = AuthenticationService.currentUserEmail;
     if (currentUserEmail == null) return null;
 
-    final pairDoc =
-        await _firestore.collection('pairs').doc(currentUserEmail).get();
+    final pairDoc = await _firestore.collection('pairs').doc(currentUserEmail).get();
 
     if (pairDoc.exists) {
-      return pairDoc['pairedUserEmail'];
+      pairedUserEmail = pairDoc['pairedUserEmail'];
+      return pairedUserEmail;
     }
     return null;
+  }
+
+  // 解除配对
+  static Future<void> unpairUsers() async {
+    final currentUserEmail = AuthenticationService.currentUserEmail;
+    if (currentUserEmail == null) return;
+
+    final pairedUserEmail = await getPairedUserEmail();
+    if (pairedUserEmail == null) return;
+
+    // 删除 pairs 集合中的配对信息
+    await _firestore.collection('pairs').doc(currentUserEmail).delete();
+    await _firestore.collection('pairs').doc(pairedUserEmail).delete();
+
+    // 清除本地状态
+    AuthenticationService.pairedUserEmail = null;
   }
 }
