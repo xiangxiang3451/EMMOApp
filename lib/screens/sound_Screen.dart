@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class SoundScreen extends StatefulWidget {
+  const SoundScreen({super.key});
+
   @override
   _SoundScreenState createState() => _SoundScreenState();
 }
@@ -56,7 +58,7 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
   Future<void> playSound(String sound) async {
     try {
       await globalAudioPlayer.setReleaseMode(ReleaseMode.loop); // 设置循环播放
-      await globalAudioPlayer.play(AssetSource('$sound'));
+      await globalAudioPlayer.play(AssetSource(sound));
       setState(() {
         isPlaying = true;
         selectedSound = sound;

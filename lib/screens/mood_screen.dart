@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:emmo/screens/home_screen.dart';
+import 'package:emmo/features/home/views/home_screen.dart';
 import 'package:emmo/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';

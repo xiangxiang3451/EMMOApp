@@ -15,7 +15,7 @@ class MyGame extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       navigatorKey: navigatorKey,
-      home: GameHomePage(),
+      home: const GameHomePage(),
     );
   }
 }

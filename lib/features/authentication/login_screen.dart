@@ -1,5 +1,5 @@
-import 'package:emmo/authentication/authentication_service.dart';
-import 'package:emmo/screens/home_screen.dart';
+import 'package:emmo/services/authentication_service.dart';
+import 'package:emmo/features/home/views/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
