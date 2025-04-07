@@ -14,6 +14,8 @@ class Visualizationnote extends StatefulWidget {
 class _VisualizationnoteState extends State<Visualizationnote> {
   List<Map<String, dynamic>> records = [];
   String? pairedUserEmail;
+  Future<void>? _getPairedUserFuture;
+  Future<void>? _getRecordsFuture;
 
   @override
   void initState() {
@@ -94,6 +96,14 @@ class _VisualizationnoteState extends State<Visualizationnote> {
         };
       }).toList();
     });
+  }
+
+  @override
+  void dispose() {
+    // 取消未完成的异步操作
+    _getPairedUserFuture?.ignore();
+    _getRecordsFuture?.ignore();
+    super.dispose();
   }
 
   @override
@@ -226,7 +236,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
                     },
                   );
                 },
-              ),
+              ),  
       ),
     );
   }

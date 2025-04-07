@@ -31,15 +31,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 页面切换方法
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Visualizationnote()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
-@override
-void initState() {
-  super.initState();
-}
+  @override
+  void initState() {
+    super.initState();
+  }
+
   // 打开MoodScreen页面的方法
   void _openMoodScreen() {
     Navigator.push(
@@ -125,13 +133,19 @@ void initState() {
             padding: const EdgeInsets.all(22.0),
             children: [
               ListTile(
-                title: const Text('选项 1',style: TextStyle(color: Colors.white),),
+                title: const Text(
+                  '选项 1',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onTap: () {
                   Navigator.pop(context); // 关闭 Drawer
                 },
               ),
               ListTile(
-                title: const Text('选项 2',style: TextStyle(color: Colors.white),),
+                title: const Text(
+                  '选项 2',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onTap: () {
                   Navigator.pop(context); // 关闭 Drawer
                 },
@@ -139,14 +153,16 @@ void initState() {
               const Divider(), // 分割线
               // 设置项
               ListTile(
-                title: const Text('设置',style: TextStyle(color: Colors.white),),
+                title: const Text(
+                  '设置',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onTap: () {
                   Navigator.pop(context); // 关闭 Drawer
                   // 展示设置内容，跳转到设置页面
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => MyGame()),
+                    MaterialPageRoute(builder: (context) => MyGame()),
                   );
                 },
               ),
