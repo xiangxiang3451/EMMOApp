@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:emmo/authentication/authentication_service.dart';
+import 'package:emmo/services/authentication_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Visualizationnote extends StatefulWidget {
