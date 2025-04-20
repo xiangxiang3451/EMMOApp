@@ -110,10 +110,6 @@ class FirebaseService {
       // 获取当前用户
       String? currentUserEmail = AuthenticationService.currentUserEmail;
 
-      if (currentUserEmail == null) {
-        throw Exception("用户未登录，无法保存记录。");
-      }
-
       // 将图片编码为 Base64 字符串（如果存在）
       String? base64Image;
       if (photoFile != null) {
@@ -162,10 +158,6 @@ class FirebaseService {
   /// 投递漂流瓶
   Future<void> createBottle(String content) async {
     String? currentUserEmail = AuthenticationService.currentUserEmail;
-    
-    if (currentUserEmail == null) {
-      throw Exception("用户未登录");
-    }
 
     final bottle = {
       "content": content,
@@ -187,10 +179,6 @@ class FirebaseService {
   try {
     // 获取当前用户的 UID
     String? currentUserEmail = AuthenticationService.currentUserEmail;
-    if (currentUserEmail == null) {
-      print("用户未登录");
-      return null;
-    }
 
     // 获取所有状态为 open 且不是当前用户投放的漂流瓶
     final querySnapshot = await FirebaseFirestore.instance
@@ -221,10 +209,6 @@ class FirebaseService {
 Future<void> respondToBottle(String bottleId, String responseContent) async {
   String? currentUserEmail = AuthenticationService.currentUserEmail;
 
-  if (currentUserEmail == null) {
-    throw Exception("用户未登录");
-  }
-
   final response = {
     "bottle_id": bottleId,
     "responder_id": currentUserEmail,
@@ -251,10 +235,6 @@ Future<void> respondToBottle(String bottleId, String responseContent) async {
 // 获取当前用户收到的回信
 Future<List<Map<String, dynamic>>> getReceivedResponses() async {
   String? currentUserEmail = AuthenticationService.currentUserEmail;
-
-  if (currentUserEmail == null) {
-    throw Exception("用户未登录");
-  }
 
   try {
     // 获取用户的所有漂流瓶（包括瓶子内容）
@@ -326,10 +306,6 @@ String _formatDate(String isoDate) {
 Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
   String? userId = AuthenticationService.currentUserEmail;
 
-  if (userId == null) {
-    throw Exception("用户未登录！");
-  }
-
   QuerySnapshot snapshot = await _firestore
       .collection('record')
       .where('userId', isEqualTo: userId) // 添加用户筛选
@@ -337,7 +313,7 @@ Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
 
   // 筛选出日期相同的记录，忽略时间部分
   return snapshot.docs.where((doc) {
-    final docDate = DateTime.parse(doc['date']);
+    final docDate = DateTime.parse(doc['date']);      
     return docDate.year == date.year && docDate.month == date.month && docDate.day == date.day;
   }).map((doc) {
     return {
@@ -353,10 +329,6 @@ Future<List<Map<String, dynamic>>> getRecordsForDate(DateTime date) async {
  // 获取所有有记录的日期（仅限当前用户）
 Future<List<DateTime>> getRecordedDates() async {
   String? userId = AuthenticationService.currentUserEmail;
-
-  if (userId == null) {
-    throw Exception("用户未登录！");
-  }
 
   // 获取当前用户的所有记录
   QuerySnapshot snapshot = await _firestore

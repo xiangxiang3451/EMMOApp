@@ -27,14 +27,6 @@ class _VisualizationnoteState extends State<Visualizationnote> {
   // 获取当前用户的记录
   Future<void> _getRecords() async {
     String? userId = AuthenticationService.currentUserEmail;
-    if (userId == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('用户未登录！')),
-        );
-      });
-      return;
-    }
 
     try {
       final firestore = FirebaseFirestore.instance;
