@@ -1,4 +1,5 @@
 // lib/features/home/views/home_screen.dart
+import 'package:emmo/features/authentication/login_screen.dart';
 import 'package:emmo/features/calendar/views/calendar_screen.dart';
 import 'package:emmo/features/chat/views/chat_screen.dart';
 import 'package:emmo/features/home/view_models/home_view_model.dart';
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const CalendarScreen(),
       const ChatScreen(),
       const MyGame(),
-      SoundScreen(),
+      const SoundScreen(),
       const Visualizationnote(),
     ];
   }
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         fontWeight: FontWeight.bold,
       ),
       iconTheme: const IconThemeData(color: Colors.white),
-      title: const Text('EMMO'),  // 使用 I18N 获取当前语言的文本
+      title: const Text('EMMO'), // 使用 I18N 获取当前语言的文本
       leading: IconButton(
         icon: const Icon(Icons.mode),
         onPressed: () => viewModel.openMoodScreen(context),
@@ -74,28 +75,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomNavigationBar(HomeViewModel viewModel, BuildContext context) {
+  Widget _buildBottomNavigationBar(
+      HomeViewModel viewModel, BuildContext context) {
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: const Icon(Icons.museum),
-          label: I18N.translate('home'),  // 动态翻译
+          label: I18N.translate('home'), // 动态翻译
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.psychology),
-          label: I18N.translate('talk'),  // 动态翻译
+          label: I18N.translate('talk'), // 动态翻译
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.games),
-          label: I18N.translate('games'),  // 动态翻译
+          label: I18N.translate('games'), // 动态翻译
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.access_time),
-          label: I18N.translate('relax'),  // 动态翻译
+          label: I18N.translate('relax'), // 动态翻译
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.settings),
-          label: I18N.translate('settings'),  // 动态翻译
+          label: I18N.translate('settings'), // 动态翻译
         ),
       ],
       currentIndex: viewModel.selectedIndex,
@@ -122,8 +124,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
               ),
               title: Text(
-                I18N.translate('export_pdf'),  // 使用 I18N 获取当前语言的文本
-                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                I18N.translate('export_pdf'), // 使用 I18N 获取当前语言的文本
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -140,15 +145,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
               ),
               title: Text(
-                I18N.translate('language'),  // 使用 I18N 获取当前语言的文本
-                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                I18N.translate('language'), // 使用 I18N 获取当前语言的文本
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500),
               ),
               onTap: () {
                 // 切换语言
                 String newLang = I18N.currentLanguage == 'en' ? 'zh' : 'en';
-                I18N.setLanguage(newLang);  // 设置新的语言
-                setState(() {});  // 通过 setState 刷新 UI
-                Navigator.pop(context);  // 关闭抽屉
+                I18N.setLanguage(newLang); // 设置新的语言
+                setState(() {}); // 通过 setState 刷新 UI
+                Navigator.pop(context); // 关闭抽屉
               },
             ),
             const Divider(
@@ -163,14 +171,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
               ),
               title: Text(
-                I18N.translate('exit'),  // 使用 I18N 获取当前语言的文本
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+                I18N.translate('exit'), // 使用 I18N 获取当前语言的文本
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500),
               ),
               onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const MyGame()),
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (Route<dynamic> route) => false, // 这个条件会移除掉所有的路由
                 );
               },
             ),
