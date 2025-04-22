@@ -6,6 +6,7 @@ import 'package:emmo/features/home/view_models/home_view_model.dart';
 import 'package:emmo/screens/game_screen.dart';
 import 'package:emmo/screens/shared_screen.dart';
 import 'package:emmo/screens/sound_Screen.dart';
+import 'package:emmo/services/export_pdf.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -119,11 +120,18 @@ class HomeScreen extends StatelessWidget {
           children: [
             ListTile(
               title: const Text(
-                '选项 1',
+                'Export PDF',
                 style: TextStyle(color: Colors.white),
               ),
-              onTap: () => Navigator.pop(context),
-            ),
+              onTap: () {
+              Navigator.pop(context);
+              // 导出 PDF
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ExportPdfScreen()),
+              );
+            },
+          ),
             ListTile(
               title: const Text(
                 '选项 2',
