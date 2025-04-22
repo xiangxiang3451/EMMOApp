@@ -1,4 +1,5 @@
 import 'package:emmo/main.dart';
+import 'package:emmo/services/language.dart'; // 引入你的I18N类
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -95,7 +96,7 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
   void startTimer() {
     if (selectedSound.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请先选择一个声音')),
+        SnackBar(content: Text(I18N.translate('please_select_sound'))),
       );
       return;
     }
@@ -103,7 +104,7 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
     int customTime = int.tryParse(customTimeController.text) ?? selectedTime;
     if (customTime <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入有效的倒计时时间')),
+        SnackBar(content: Text(I18N.translate('enter_valid_time'))),
       );
       return;
     }
@@ -158,7 +159,7 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
         // 如果倒计时正在运行且未暂停，则阻止返回
         if (isTimerRunning && !isPaused) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('倒计时运行中，无法退出页面')),
+            SnackBar(content: Text(I18N.translate('timer_running'))),
           );
           return false;
         }
@@ -171,9 +172,9 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                '选择声音',
-                style: TextStyle(
+              Text(
+                I18N.translate('choose_sound'),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.deepOrange,
@@ -200,9 +201,9 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
                 }).toList(),
               ),
               const SizedBox(height: 40),
-              const Text(
-                '选择倒计时',
-                style: TextStyle(
+              Text(
+                I18N.translate('choose_timer'),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.deepOrange,
@@ -213,7 +214,7 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
                 spacing: 10,
                 children: timerOptions.map((time) {
                   return ChoiceChip(
-                    label: Text('$time 分钟'),
+                    label: Text('$time ${I18N.translate('minutes')}'),
                     selected: selectedTime == time,
                     onSelected: (selected) {
                       setState(() {
@@ -231,16 +232,16 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
               const SizedBox(height: 20),
               TextField(
                 controller: customTimeController,
-                decoration: const InputDecoration(
-                  labelText: '自定义倒计时时间（分钟）',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: I18N.translate('custom_timer_label'),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
               ),
               // const SizedBox(height: 40),
               if (isTimerRunning)
                 Text(
-                  '剩余时间: ${formatTime(remainingTime)}',
+                  '${I18N.translate('remaining_time')}: ${formatTime(remainingTime)}',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -258,9 +259,9 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    '开始',
-                    style: TextStyle(
+                  child: Text(
+                    I18N.translate('start'),
+                    style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white,
                     ),
@@ -276,9 +277,9 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    '暂停',
-                    style: TextStyle(
+                  child: Text(
+                    I18N.translate('pause'),
+                    style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white,
                     ),
@@ -294,9 +295,9 @@ class _SoundScreenState extends State<SoundScreen> with WidgetsBindingObserver {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    '继续',
-                    style: TextStyle(
+                  child: Text(
+                    I18N.translate('resume'),
+                    style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white,
                     ),

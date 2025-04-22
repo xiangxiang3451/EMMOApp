@@ -1,5 +1,4 @@
-// features/home/views/home_screen.dart
-import 'package:emmo/services/authentication_service.dart';
+// lib/features/home/views/home_screen.dart
 import 'package:emmo/features/calendar/views/calendar_screen.dart';
 import 'package:emmo/features/chat/views/chat_screen.dart';
 import 'package:emmo/features/home/view_models/home_view_model.dart';
@@ -7,17 +6,20 @@ import 'package:emmo/screens/game_screen.dart';
 import 'package:emmo/screens/shared_screen.dart';
 import 'package:emmo/screens/sound_Screen.dart';
 import 'package:emmo/services/export_pdf.dart';
+import 'package:emmo/services/language.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
   Widget build(BuildContext context) {
-    // 获取依赖服务
-    final authService = Provider.of<AuthenticationService>(context, listen: false);
-    
     return ChangeNotifierProvider(
       create: (_) => HomeViewModel(
         widgetOptions: _buildWidgetOptions(context),
@@ -26,7 +28,7 @@ class HomeScreen extends StatelessWidget {
         builder: (context, viewModel, child) {
           return Scaffold(
             key: viewModel.scaffoldKey,
-            appBar: _buildAppBar(context, viewModel, authService),
+            appBar: _buildAppBar(context, viewModel),
             body: viewModel.currentPage,
             bottomNavigationBar: _buildBottomNavigationBar(viewModel, context),
             drawer: _buildDrawer(context),
@@ -46,11 +48,7 @@ class HomeScreen extends StatelessWidget {
     ];
   }
 
-  AppBar _buildAppBar(
-    BuildContext context,
-    HomeViewModel viewModel,
-    AuthenticationService authService,
-  ) {
+  AppBar _buildAppBar(BuildContext context, HomeViewModel viewModel) {
     return AppBar(
       automaticallyImplyLeading: false,
       centerTitle: true,
@@ -62,7 +60,7 @@ class HomeScreen extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       iconTheme: const IconThemeData(color: Colors.white),
-      title: const Text('EMMO'),
+      title: const Text('EMMO'),  // 使用 I18N 获取当前语言的文本
       leading: IconButton(
         icon: const Icon(Icons.mode),
         onPressed: () => viewModel.openMoodScreen(context),
@@ -78,26 +76,26 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildBottomNavigationBar(HomeViewModel viewModel, BuildContext context) {
     return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
+      items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.museum),
-          label: 'Home',
+          icon: const Icon(Icons.museum),
+          label: I18N.translate('home'),  // 动态翻译
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.psychology),
-          label: 'Talk',
+          icon: const Icon(Icons.psychology),
+          label: I18N.translate('talk'),  // 动态翻译
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.games),
-          label: 'Games',
+          icon: const Icon(Icons.games),
+          label: I18N.translate('games'),  // 动态翻译
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.access_time),
-          label: "Relax",
+          icon: const Icon(Icons.access_time),
+          label: I18N.translate('relax'),  // 动态翻译
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: "Games",
+          icon: const Icon(Icons.settings),
+          label: I18N.translate('settings'),  // 动态翻译
         ),
       ],
       currentIndex: viewModel.selectedIndex,
@@ -119,31 +117,54 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(22.0),
           children: [
             ListTile(
-              title: const Text(
-                'Export PDF',
-                style: TextStyle(color: Colors.white),
+              leading: const Icon(
+                Icons.picture_as_pdf, // PDF 图标
+                color: Colors.white,
+              ),
+              title: Text(
+                I18N.translate('export_pdf'),  // 使用 I18N 获取当前语言的文本
+                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
               ),
               onTap: () {
-              Navigator.pop(context);
-              // 导出 PDF
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ExportPdfScreen()),
-              );
-            },
-          ),
-            ListTile(
-              title: const Text(
-                '选项 2',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () => Navigator.pop(context),
+                Navigator.pop(context);
+                // 导出 PDF
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ExportPdfScreen()),
+                );
+              },
             ),
-            const Divider(),
             ListTile(
-              title: const Text(
-                '设置',
-                style: TextStyle(color: Colors.white),
+              leading: const Icon(
+                Icons.language, // 语言图标
+                color: Colors.white,
+              ),
+              title: Text(
+                I18N.translate('language'),  // 使用 I18N 获取当前语言的文本
+                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+              onTap: () {
+                // 切换语言
+                String newLang = I18N.currentLanguage == 'en' ? 'zh' : 'en';
+                I18N.setLanguage(newLang);  // 设置新的语言
+                setState(() {});  // 通过 setState 刷新 UI
+                Navigator.pop(context);  // 关闭抽屉
+              },
+            ),
+            const Divider(
+              color: Colors.white70,
+              thickness: 1,
+              indent: 20,
+              endIndent: 20,
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.exit_to_app, // 退出图标
+                color: Colors.white,
+              ),
+              title: Text(
+                I18N.translate('exit'),  // 使用 I18N 获取当前语言的文本
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
               ),
               onTap: () {
                 Navigator.pop(context);

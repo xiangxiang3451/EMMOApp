@@ -6,6 +6,7 @@ import 'package:emmo/services/gpt_service.dart';
 import 'package:flutter/material.dart';
 import 'package:emmo/features/chat/view_models/chat_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:emmo/services/language.dart';  // 引入I18N类
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});
@@ -23,9 +24,8 @@ class ChatScreen extends StatelessWidget {
         firebaseService: firebaseService,
         currentUserEmail: AuthenticationService.currentUserEmail,
       ),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Emotion Chat')),
-        body: const _ChatBody(),
+      child: const Scaffold(
+        body: _ChatBody(),
       ),
     );
   }
@@ -138,16 +138,16 @@ class _ChatInput extends StatelessWidget {
         Expanded(
           child: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Enter your feelings',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: I18N.translate('enter_your_feelings'), // 使用I18N进行翻译
+              border: const OutlineInputBorder(),
             ),
           ),
         ),
         const SizedBox(width: 10),
         ElevatedButton(
           onPressed: onSend,
-          child: const Text('Send'),
+          child: Text(I18N.translate('send')), // 使用I18N进行翻译
         ),
       ],
     );
@@ -166,11 +166,11 @@ class _ActionButtons extends StatelessWidget {
       children: [
         ElevatedButton(
           onPressed: viewModel.continueConversation,
-          child: const Text('Continue'),
+          child: Text(I18N.translate('continue')), // 使用I18N进行翻译
         ),
         ElevatedButton(
           onPressed: viewModel.endAndSummarizeConversation,
-          child: const Text('End & Summarize'),
+          child: Text(I18N.translate('end_and_summarize')), // 使用I18N进行翻译
         ),
       ],
     );
@@ -187,7 +187,7 @@ class _RestartButton extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         onPressed: viewModel.restartConversation,
-        child: const Text('Restart Conversation'),
+        child: Text(I18N.translate('restart_conversation')), // 使用I18N进行翻译
       ),
     );
   }
