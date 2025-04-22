@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Volumes/Chang/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/pengxiang/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Volumes/Chang/work-space/BKP/EMMOApp/android/app/.cxx/Debug/2t2w4m3z/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/pengxiang/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Volumes/Chang/work-space/BKP/EMMOApp/android/app/.cxx/Debug/2t2w4m3z/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

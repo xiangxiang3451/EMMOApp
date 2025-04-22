@@ -1,0 +1,2 @@
+/Volumes/Chang/work-space/BKP/EMMOApp/android/app/.cxx/Debug/2t2w4m3z/arm64-v8a/CMakeFiles/edit_cache.dir
+/Volumes/Chang/work-space/BKP/EMMOApp/android/app/.cxx/Debug/2t2w4m3z/arm64-v8a/CMakeFiles/rebuild_cache.dir

@@ -197,29 +197,6 @@ class _NextPageState extends State<NextPage> {
     _getCurrentLocation();
   }
 
-  Future<void> _getPermission() async {
-    LocationPermission permission;
-
-    // 检查是否已经授权
-    permission = await Geolocator.checkPermission();
-
-    // 如果未授权，发起请求
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) {
-        // 用户永久拒绝权限
-        throw Exception(
-            'Location permissions are permanently denied, we cannot request permissions.');
-      }
-    }
-
-    if (permission == LocationPermission.denied) {
-      // 用户仅临时拒绝权限
-      throw Exception('Location permissions are denied');
-    }
-
-    // 如果获取了权限，可以安全地调用位置方法
-  }
 
   Future<void> _getCurrentLocation() async {
     setState(() {

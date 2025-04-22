@@ -16,7 +16,7 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
 
   bool _isLoadingThrow = false; // 扔漂流瓶的加载状态
   bool _isLoadingResponse = false; // 回复漂流瓶的加载状态
-  bool _isLoadingPick = false; // 拾取漂流瓶的加载状态
+// 拾取漂流瓶的加载状态
 
   /// 扔漂流瓶
   void _submitBottle() async {
@@ -53,7 +53,6 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
   /// 拾取漂流瓶
   void _pickBottle() async {
     setState(() {
-      _isLoadingPick = true;
     });
 
     try {
@@ -73,7 +72,6 @@ class _DriftBottlePageState extends State<DriftBottlePage> {
       );
     } finally {
       setState(() {
-        _isLoadingPick = false;
       });
     }
   }
