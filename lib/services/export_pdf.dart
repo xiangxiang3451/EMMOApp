@@ -23,9 +23,8 @@ const Map<String, String> emojiToText = {
   "🥳": "Celebrating"
 };
 
-// 将表情符号替换为对应的英文描述
 String replaceEmojiWithText(String expression) {
-  return emojiToText[expression] ?? expression; // 如果表情符号没有对应的文本，返回原表情符号
+  return emojiToText[expression] ?? expression;
 }
 
 class ExportPdfScreen extends StatefulWidget {
@@ -36,7 +35,6 @@ class ExportPdfScreen extends StatefulWidget {
 class _ExportPdfScreenState extends State<ExportPdfScreen> {
   List<Map<String, dynamic>> records = [];
 
-  // 获取记录
   Future<void> _getRecords() async {
     String? userId = AuthenticationService.currentUserEmail;
 
@@ -46,16 +44,16 @@ class _ExportPdfScreenState extends State<ExportPdfScreen> {
       final snapshot = await firestore
           .collection('record')
           .where('userId', isEqualTo: userId)
-          .orderBy('time', descending: true) // 确保按时间倒序查询
+          .orderBy('time', descending: true)
           .get();
 
       setState(() {
         records = snapshot.docs.map((doc) {
           return {
-            'expression': doc['expression'], // 表情
-            'date': doc['date'], // 日期
-            'address': doc['address'], // 地址
-            'thoughts': doc['thoughts'], // 备注
+            'expression': doc['expression'],
+            'date': doc['date'],
+            'address': doc['address'],
+            'thoughts': doc['thoughts'],
           };
         }).toList();
       });
@@ -69,37 +67,53 @@ class _ExportPdfScreenState extends State<ExportPdfScreen> {
   Future<void> _generatePDF() async {
     final pdf = pw.Document();
 
-    pdf.addPage(pw.Page(
-      build: (pw.Context context) {
-        return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text('User Mood Records', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 20),
-            ...records.map((record) {
-              return pw.Column(
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
+        header: (pw.Context context) => pw.Text(
+          'User Mood Records',
+          style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
+        ),
+        footer: (pw.Context context) => pw.Text(
+          'Page ${context.pageNumber} of ${context.pagesCount}',
+          textAlign: pw.TextAlign.right,
+          style: pw.TextStyle(fontSize: 12, color: PdfColors.grey),
+        ),
+        build: (pw.Context context) => [
+          ...records.map((record) {
+            return pw.Container(
+              margin: const pw.EdgeInsets.only(bottom: 16),
+              padding: const pw.EdgeInsets.all(8),
+              decoration: pw.BoxDecoration(
+                border: pw.Border.all(color: PdfColors.grey),
+                borderRadius: pw.BorderRadius.circular(4),
+              ),
+              child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text('Expression: ${replaceEmojiWithText(record['expression'])}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.Text('Date: ${record['date']}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.Text('Address: ${record['address']}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.Text('Thoughts: ${record['thoughts']}', style: const pw.TextStyle(fontSize: 14)),
-                  pw.SizedBox(height: 10),
+                  pw.Text(
+                    'Expression: ${replaceEmojiWithText(record['expression'])}',
+                    style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text('Date: ${record['date']}', style: const pw.TextStyle(fontSize: 12)),
+                  pw.Text('Address: ${record['address']}', style: const pw.TextStyle(fontSize: 12)),
+                  pw.Text('Thoughts: ${record['thoughts']}', style: const pw.TextStyle(fontSize: 12)),
                 ],
-              );
-            }),
-          ],
-        );
-      },
-    ));
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
 
-    // 保存 PDF 文件
     final output = await getTemporaryDirectory();
     final file = File("${output.path}/user_mood_records.pdf");
     await file.writeAsBytes(await pdf.save());
 
-    // 打开 PDF 文件
     Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('PDF generated successfully!')),
     );
@@ -108,7 +122,7 @@ class _ExportPdfScreenState extends State<ExportPdfScreen> {
   @override
   void initState() {
     super.initState();
-    _getRecords();  // 加载记录
+    _getRecords();
   }
 
   @override
