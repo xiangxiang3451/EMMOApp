@@ -20,33 +20,33 @@ class _VisualizationnoteState extends State<Visualizationnote> {
   @override
   void initState() {
     super.initState();
-    _getPairedUser(); // 获取配对用户
-    _getRecords(); // 获取当前用户的记录
+    _getPairedUser(); // Get paired user
+    _getRecords(); // Get current user's records
   }
 
-  // 获取当前用户的记录
+  // Get current user's records
   Future<void> _getRecords() async {
     String? userId = AuthenticationService.currentUserEmail;
 
     try {
       final firestore = FirebaseFirestore.instance;
 
-      // 获取当前用户的记录集合
+      // Get current user's record collection
       final snapshot = await firestore
-          .collection('record') // 记录集合
-          .where('userId', isEqualTo: userId) // 按用户ID查询
-          .orderBy('time', descending: true) // 按时间倒序排序
+          .collection('record') // Record collection
+          .where('userId', isEqualTo: userId) // Query by user ID
+          .orderBy('time', descending: true) // Sort by time descending
           .get();
 
       setState(() {
         records = snapshot.docs.map((doc) {
           return {
-            'expression': doc['expression'], // 表情
-            'color': doc['color'], // 颜色
-            'date': doc['date'], // 日期
-            'address': doc['address'], // 地址
-            'thoughts': doc['thoughts'], // 思想/备注
-            'photo': doc['photo'], // 图片 base64
+            'expression': doc['expression'], // Expression
+            'color': doc['color'], // Color
+            'date': doc['date'], // Date
+            'address': doc['address'], // Address
+            'thoughts': doc['thoughts'], // Thoughts/notes
+            'photo': doc['photo'], // Photo base64
           };
         }).toList();
       });
@@ -59,7 +59,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
     }
   }
 
-  // 获取配对用户
+  // Get paired user
   Future<void> _getPairedUser() async {
     final email = await AuthenticationService.getPairedUserEmail();
     setState(() {
@@ -67,7 +67,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
     });
   }
 
-  // 获取对方用户的心情记录
+  // Get paired user's mood records
   Stream<List<Map<String, dynamic>>> _getPairedUserMoods() {
     final firestore = FirebaseFirestore.instance;
 
@@ -92,7 +92,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
 
   @override
   void dispose() {
-    // 取消未完成的异步操作
+    // Cancel unfinished async operations
     _getPairedUserFuture?.ignore();
     _getRecordsFuture?.ignore();
     super.dispose();
@@ -102,19 +102,19 @@ class _VisualizationnoteState extends State<Visualizationnote> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('心情记录'),
+        title: const Text('Mood Records'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              _getRecords(); // 刷新当前用户记录
-              _getPairedUser(); // 刷新配对用户
+              _getRecords(); // Refresh current user's records
+              _getPairedUser(); // Refresh paired user
             },
           ),
           IconButton(
             icon: const Icon(Icons.person_add),
             onPressed: () {
-              // 跳转到配对界面
+              // Navigate to pairing screen
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const PairingScreen()),
@@ -129,7 +129,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
                 pairedUserEmail = null;
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('已解除配对')),
+                const SnackBar(content: Text('Unpaired successfully')),
               );
             },
           ),
@@ -138,7 +138,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
       body: Container(
         color: Colors.white.withOpacity(0.8),
         child: pairedUserEmail == null
-            ? const Center(child: Text('未配对用户'))
+            ? const Center(child: Text('No paired user'))
             : StreamBuilder<List<Map<String, dynamic>>>(
                 stream: _getPairedUserMoods(),
                 builder: (context, snapshot) {
@@ -147,7 +147,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('对方暂无心情记录'));
+                    return const Center(child: Text('No mood records from paired user'));
                   }
 
                   final pairedRecords = snapshot.data!;
@@ -233,7 +233,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
     );
   }
 
-  // 显示心情记录详情
+  // Show mood record details
   void _showRecordDetails(BuildContext context, Map<String, dynamic> record) {
     final expression = record['expression'];
     final colorValue = record['color'];
@@ -254,7 +254,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
             children: [
               Row(
                 children: [
-                  const Text('日期: '),
+                  const Text('Date: '),
                   Text(
                     date,
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -264,14 +264,14 @@ class _VisualizationnoteState extends State<Visualizationnote> {
               const SizedBox(height: 5),
               Row(
                 children: [
-                  const Text('地址: '),
+                  const Text('Address: '),
                   Expanded(child: Text(address)),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
                 children: [
-                  const Text('备注: '),
+                  const Text('Notes: '),
                   Expanded(child: Text(thoughts)),
                 ],
               ),
@@ -292,7 +292,7 @@ class _VisualizationnoteState extends State<Visualizationnote> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('关闭'),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -315,10 +315,10 @@ class _PairingScreenState extends State<PairingScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPairCode(); // 加载当前用户的配对码
+    _loadPairCode(); // Load current user's pair code
   }
 
-  // 加载当前用户的配对码
+  // Load current user's pair code
   Future<void> _loadPairCode() async {
     final currentUserEmail = AuthenticationService.currentUserEmail;
     if (currentUserEmail == null) return;
@@ -334,12 +334,12 @@ class _PairingScreenState extends State<PairingScreen> {
     }
   }
 
-  // 处理配对逻辑
+  // Handle pairing logic
   Future<void> _pairUsers() async {
     final pairCode = _pairCodeController.text.trim();
     if (pairCode.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入配对码')),
+        const SnackBar(content: Text('Please enter pair code')),
       );
       return;
     }
@@ -352,17 +352,17 @@ class _PairingScreenState extends State<PairingScreen> {
       final success = await AuthenticationService.pairUsers(pairCode);
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('配对成功！')),
+          const SnackBar(content: Text('Pairing successful!')),
         );
-        Navigator.pop(context); // 返回上一页
+        Navigator.pop(context); // Return to previous page
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('配对失败，请检查配对码')),
+          const SnackBar(content: Text('Pairing failed, please check pair code')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('配对失败: $e')),
+        SnackBar(content: Text('Pairing failed: $e')),
       );
     } finally {
       setState(() {
@@ -375,7 +375,7 @@ class _PairingScreenState extends State<PairingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('用户配对'),
+        title: const Text('User Pairing'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -383,7 +383,7 @@ class _PairingScreenState extends State<PairingScreen> {
           children: [
             if (_currentPairCode != null) ...[
               Text(
-                '您的配对码：$_currentPairCode',
+                'Your pair code: $_currentPairCode',
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -392,8 +392,8 @@ class _PairingScreenState extends State<PairingScreen> {
             TextField(
               controller: _pairCodeController,
               decoration: const InputDecoration(
-                labelText: '输入配对码',
-                hintText: '请输入6位配对码',
+                labelText: 'Enter pair code',
+                hintText: 'Please enter 6-digit pair code',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
@@ -403,7 +403,7 @@ class _PairingScreenState extends State<PairingScreen> {
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: _pairUsers,
-                    child: const Text('配对'),
+                    child: const Text('Pair'),
                   ),
           ],
         ),

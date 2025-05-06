@@ -1,0 +1,2 @@
+/Volumes/Chang/work-space/BKP/EMMOApp/android/app/.cxx/RelWithDebInfo/1c3m1267/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Volumes/Chang/work-space/BKP/EMMOApp/android/app/.cxx/RelWithDebInfo/1c3m1267/armeabi-v7a/CMakeFiles/rebuild_cache.dir
