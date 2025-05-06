@@ -96,8 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
           label: I18N.translate('relax'), // 动态翻译
         ),
         BottomNavigationBarItem(
-          icon: const Icon(Icons.settings),
-          label: I18N.translate('settings'), // 动态翻译
+          icon: const Icon((Icons.family_restroom)),
+          label: I18N.translate('Share'), // 动态翻译
         ),
       ],
       currentIndex: viewModel.selectedIndex,
