@@ -32,6 +32,7 @@ dependencies:
   path_provider: ^2.1.1
   open_file: ^3.3.1
   printing: ^5.7.0
+  fl_chart: ^0.71.0
 
 
 dev_dependencies:

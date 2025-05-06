@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emmo/services/authentication_service.dart';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
@@ -34,6 +35,12 @@ class ExportPdfScreen extends StatefulWidget {
 
 class _ExportPdfScreenState extends State<ExportPdfScreen> {
   List<Map<String, dynamic>> records = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getRecords();
+  }
 
   Future<void> _getRecords() async {
     String? userId = AuthenticationService.currentUserEmail;
@@ -119,20 +126,162 @@ class _ExportPdfScreenState extends State<ExportPdfScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _getRecords();
+  List<PieChartSectionData> _generatePieChartSections() {
+    Map<String, int> moodCount = {
+      for (var mood in emojiToText.values) mood: 0,
+    };
+
+    for (var record in records) {
+      String moodText = replaceEmojiWithText(record['expression']);
+      if (moodCount.containsKey(moodText)) {
+        moodCount[moodText] = moodCount[moodText]! + 1;
+      }
+    }
+
+    return moodCount.entries
+        .where((entry) => entry.value > 0)
+        .map((entry) => PieChartSectionData(
+              value: entry.value.toDouble(),
+              title: entry.key,
+              color: _getColorForMood(entry.key),
+              radius: 50,
+              titleStyle: const TextStyle(fontSize: 0), // 不显示文字
+            ))
+        .toList();
+  }
+
+  Color _getColorForMood(String mood) {
+    switch (mood) {
+      case 'Happy':
+        return Colors.yellow;
+      case 'Sad':
+        return Colors.blue;
+      case 'Angry':
+        return Colors.red;
+      case 'Fearful':
+        return Colors.purple;
+      case 'Tired':
+        return Colors.grey;
+      case 'Laughing':
+        return Colors.orange;
+      case 'Crying':
+        return Colors.lightBlue;
+      case 'In Love':
+        return Colors.pink;
+      case 'Thinking':
+        return Colors.green;
+      case 'Cool':
+        return Colors.teal;
+      case 'Upside Down':
+        return Colors.indigo;
+      case 'Celebrating':
+        return Colors.amber;
+      default:
+        return Colors.black;
+    }
+  }
+
+  void _showPieChartDialog(BuildContext context) {
+    final sections = _generatePieChartSections();
+    final total = sections.fold<double>(0, (sum, item) => sum + item.value);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Mood Distribution'),
+          content: SizedBox(
+            height: 400,
+            width: 400,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: PieChart(
+                    PieChartData(
+                      sections: sections.map((s) => s.copyWith(title: '')).toList(),
+                      borderData: FlBorderData(show: false),
+                      centerSpaceRadius: 30,
+                      sectionsSpace: 2,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  flex: 3,
+                  child: ListView(
+                    children: sections.map((s) {
+                      final percentage = (s.value / total * 100).toStringAsFixed(1);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: s.color,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                '${s.title} - $percentage%',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Export Mood Records')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: _generatePDF,
-          child: const Text('Export as PDF'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              onPressed: _generatePDF,
+              icon: const Icon(Icons.picture_as_pdf),
+              label: const Text('Export as PDF'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                textStyle: const TextStyle(fontSize: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () => _showPieChartDialog(context),
+              icon: const Icon(Icons.pie_chart),
+              label: const Text('Export as Pie Chart'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                textStyle: const TextStyle(fontSize: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
         ),
       ),
     );
