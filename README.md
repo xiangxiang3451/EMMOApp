@@ -42,3 +42,7 @@ An Android application developed using the Flutter framework and Firebase databa
 
   printing: ^5.7.0
 
+  fl_chart: ^0.71.0
+  
+  flutter_launcher_icons: ^0.14.3
+

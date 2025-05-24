@@ -24,7 +24,7 @@ class DayDetailsScreen extends StatelessWidget {
           }
 
           if (viewModel.records.isEmpty) {
-            return const Center(child: Text('当天没有记录'));
+            return const Center(child: Text('No records for this day'));
           }
 
           return ListView.builder(

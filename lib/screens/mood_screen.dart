@@ -517,7 +517,7 @@ class _NextPageState extends State<NextPage> {
                             ListTile(
                               leading: const Icon(Icons.camera_alt,
                                   color: Colors.blue),
-                              title: const Text('拍摄照片'),
+                              title: const Text('Take photos'),
                               onTap: () {
                                 Navigator.pop(context); // 关闭底部弹窗
                                 _pickImageFromCamera(); // 调用拍摄照片方法
@@ -526,7 +526,7 @@ class _NextPageState extends State<NextPage> {
                             ListTile(
                               leading: const Icon(Icons.photo_library,
                                   color: Colors.green),
-                              title: const Text('从相册选择'),
+                              title: const Text('Select from album'),
                               onTap: () {
                                 Navigator.pop(context); // 关闭底部弹窗
                                 _pickImageFromGallery(); // 调用相册选择方法
@@ -535,7 +535,7 @@ class _NextPageState extends State<NextPage> {
                             ListTile(
                               leading:
                                   const Icon(Icons.cancel, color: Colors.red),
-                              title: const Text('取消'),
+                              title: const Text('Cancel'),
                               onTap: () {
                                 Navigator.pop(context); // 关闭底部弹窗
                               },
@@ -604,7 +604,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   LatLng? _selectedLocation;
   GoogleMapController? _mapController;
   bool _isLoading = true;
-  String _currentAddress = "点击地图上的位置以获取地址"; // 当前点击的地址
+  String _currentAddress = "Click on the location on the map to get the address"; // 当前点击的地址
 
   @override
   void initState() {
@@ -685,14 +685,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("选择位置"),
+        title: const Text("Select Location"),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context, _selectedLocation);
             },
             child: const Text(
-              "确认",
+              "confirm",
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -722,14 +722,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                       IconButton(
                         icon: const Icon(Icons.check, color: Colors.green),
                         onPressed: () {
-                          if (_currentAddress != "点击地图上的位置以获取地址") {
+                          if (_currentAddress != "Click on the location on the map to get the address") {
                             Navigator.pop(context, {
                               'location': _selectedLocation,
                               'address': _currentAddress,
                             });
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("请选择一个位置")),
+                              const SnackBar(content: Text("Please select a location")),
                             );
                           }
                         },
