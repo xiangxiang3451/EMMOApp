@@ -1,4 +1,4 @@
-const String mail="xiangxiang3451@gmail.com";
-const String mailPassword="ksej olvw tuoj xkww";
-const String gptKey="sk-7dEGzNu1y29NAAQySrasafMXpoApQfKukFffwrd4iYUxwP7B"; 
+const String mail=""; //Email for SMTP
+const String mailPassword="";
+const String gptKey="";//chatGPT key 
 
